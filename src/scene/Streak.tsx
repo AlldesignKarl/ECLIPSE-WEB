@@ -40,17 +40,19 @@ void main() {
 
   // Nucleo finisimo con un halo muy ajustado. El grosor crece un poco hacia
   // los extremos, como una llamarada que se abre al alejarse.
-  float thickness = 0.055 + d * 0.16;
-  float core = 1.0 - smoothstep(0.0, thickness * 0.30, abs(y));
-  float glow = 1.0 - smoothstep(0.0, thickness * 2.6, abs(y));
+  float thickness = 0.16 + d * 0.30;
+  float core = 1.0 - smoothstep(0.0, thickness * 0.34, abs(y));
+  float glow = 1.0 - smoothstep(0.0, thickness * 3.2, abs(y));
 
   // Se apaga hacia las puntas, y arranca justo fuera del disco.
-  float along = (1.0 - smoothstep(0.20, 1.0, d)) * smoothstep(0.10, 0.24, d);
+  // Arranca pegado al borde del disco: si empieza lejos se lee como dos rayas
+  // sueltas en vez de como una linea que lo atraviesa.
+  float along = (1.0 - smoothstep(0.14, 0.92, d)) * smoothstep(0.045, 0.10, d);
 
   // Ruido a lo largo: la luz no es un tubo perfecto.
   float grain = 0.72 + 0.42 * smoothstep(-0.2, 0.3, fbm(vec3(x * 5.0, 0.0, uTime * 0.05), 3));
 
-  float i = (core * 1.15 + glow * 0.30) * along * grain * uIntensity;
+  float i = (core * 3.4 + glow * 0.85) * along * grain * uIntensity;
   vec3 col = mix(vec3(0.72, 0.84, 1.0), vec3(1.0), clamp(core, 0.0, 1.0));
 
   gl_FragColor = vec4(col * i + dither(gl_FragCoord.xy), 1.0);
@@ -72,8 +74,8 @@ export function Streak() {
   });
 
   return (
-    <mesh ref={mesh} position={[0, 0, -0.45]} renderOrder={-2}>
-      <planeGeometry args={[26, 5]} />
+    <mesh ref={mesh} position={[0, 0, -0.12]} renderOrder={-2}>
+      <planeGeometry args={[26, 4]} />
       <shaderMaterial
         ref={material}
         uniforms={uniforms}

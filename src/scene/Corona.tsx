@@ -93,7 +93,7 @@ void main() {
 
   // Recortes: fuera del circulo y dentro del disco no hay corona. Muere sobre
   // los dos radios y medio del disco, que es lo que mide una corona real.
-  float outer = 1.0 - smoothstep(0.34, 0.95, r);
+  float outer = 1.0 - smoothstep(0.30, 0.76, r);
   float inner = smoothstep(DISC * 0.96, DISC * 1.10, r);
   float d = dens * outer * inner;
 
