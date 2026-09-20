@@ -148,12 +148,14 @@ export function Particles() {
   );
 
   useFrame((state, delta) => {
-    uniforms.uTime.value += delta;
-    uniforms.uBurst.value = sceneState.burst;
-    uniforms.uPixelRatio.value = dpr;
-    const camera = state.camera as THREE.PerspectiveCamera;
-    uniforms.uProjScale.value =
-      state.size.height / (2 * Math.tan((camera.fov * Math.PI) / 360));
+    const u = (points.current?.material as THREE.ShaderMaterial | undefined)?.uniforms;
+    if (u) {
+      u.uTime.value += delta;
+      u.uBurst.value = sceneState.burst;
+      u.uPixelRatio.value = dpr;
+      const camera = state.camera as THREE.PerspectiveCamera;
+      u.uProjScale.value = state.size.height / (2 * Math.tan((camera.fov * Math.PI) / 360));
+    }
     // Fuera de su ventana no se despacha ni un vertice.
     if (points.current) points.current.visible = sceneState.burst > 0.0015;
   });

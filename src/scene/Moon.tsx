@@ -85,10 +85,13 @@ export function Moon() {
   );
 
   useFrame((_, delta) => {
-    uniforms.uTime.value += delta;
-    uniforms.uCoronaLight.value = sceneState.corona;
-    uniforms.uCracks.value = sceneState.cracks;
-    uniforms.uOpacity.value = sceneState.disc;
+    const u = material.current?.uniforms;
+    if (u) {
+      u.uTime.value += delta;
+      u.uCoronaLight.value = sceneState.corona;
+      u.uCracks.value = sceneState.cracks;
+      u.uOpacity.value = sceneState.disc;
+    }
     if (material.current) {
       // Mientras es opaca escribe profundidad y ocluye lo que hay detras. En
       // cuanto empieza a irse deja de hacerlo, para no recortar las particulas

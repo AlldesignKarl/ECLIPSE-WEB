@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { NOISE_GLSL } from '../shaders/noise';
@@ -71,37 +71,54 @@ void main() {
 
     // Dos escalas angulares. La baja dibuja las plumas grandes, que son las que
     // dan la silueta; la alta, el hilado fino de dentro de cada una.
-    float coarse = fbm(ray * 2.3 + vec3(0.0, 0.0, uTime * 0.012), 2);
-    float fine = fbm(ray * (5.5 + rr * 6.0) + vec3(0.0, 0.0, uTime * 0.02), 4);
+    //
+    // A cada una se le resta su propia tendencia local: un paso alto que deja el
+    // ruido centrado en cero sea cual sea su sesgo. Es la diferencia entre ver
+    // plumas y ver un degradado radial liso, porque si el ruido esta sesgado
+    // cualquier umbral que pongas encima satura en casi todo el campo. Y el
+    // sesgo depende del hash, asi que calibrarlo a ojo no aguanta un cambio de
+    // frecuencia.
+    float coarse = fbm(ray * 2.4 + vec3(0.0, 0.0, uTime * 0.012), 3) - fbm(ray * 0.7, 2);
+    float fine = fbm(ray * (5.6 + rr * 6.0) + vec3(0.0, 0.0, uTime * 0.02), 4) - fbm(ray * 1.4, 2);
 
     // smoothstep en lugar de pow: acota el resultado a [0,1] pase lo que pase
-    // con el ruido. Con pow, un pico del ruido dispara el valor, todo satura y
-    // la corona se convierte en un lavado plano sin estructura.
-    float plume = smoothstep(-0.12, 0.42, fine) * (0.30 + 0.95 * smoothstep(-0.20, 0.34, coarse));
+    // con el ruido. Con pow, un pico dispara el valor y todo satura.
+    float plume = smoothstep(0.0, 0.26, fine) * (0.22 + 1.05 * smoothstep(-0.04, 0.20, coarse));
 
     // Caida exponencial en lugar de una potencia de 1/r: misma lectura, sin la
     // singularidad que revienta el borde del disco.
-    dens += plume * exp(-(rr - DISC) * 15.0);
+    dens += plume * exp(-(rr - DISC) * 6.5);
   }
   dens /= float(STEPS);
 
   // Recortes: fuera del circulo y dentro del disco no hay corona. Muere sobre
   // los dos radios y medio del disco, que es lo que mide una corona real.
-  float outer = 1.0 - smoothstep(0.30, 0.68, r);
+  float outer = 1.0 - smoothstep(0.34, 0.95, r);
   float inner = smoothstep(DISC * 0.96, DISC * 1.10, r);
   float d = dens * outer * inner;
 
   // Las zonas densas tiran a blanco, las finas al azul del sistema.
   vec3 cold = vec3(0.30, 0.54, 0.84);
   vec3 bright = vec3(0.90, 0.96, 1.0);
-  vec3 col = mix(cold, bright, clamp(d * 5.0, 0.0, 1.0));
+  vec3 col = mix(cold, bright, clamp(d * 14.0, 0.0, 1.0));
 
-  gl_FragColor = vec4(col * d * uIntensity * 3.4 + dither(gl_FragCoord.xy), clamp(d * uIntensity * 4.0, 0.0, 1.0));
+  // El alfa va a UNO, no a d.
+  //
+  // Con mezcla aditiva el resultado es color * alfa + destino. Si se modula el
+  // alfa tambien por la densidad, la contribucion acaba yendo como d al
+  // cuadrado, y con d alrededor de 0.05 eso hunde las plumas hasta hacerlas
+  // invisibles por mucho que se suba la ganancia. Toda la modulacion va en el
+  // color; el alfa solo escala.
+  //
+  // Ganancia calibrada sobre el valor medido de d: unos 0.10 en el pico junto
+  // al disco y 0.006 en el borde exterior.
+  gl_FragColor = vec4(col * d * uIntensity * 1.9 + dither(gl_FragCoord.xy), 1.0);
 }
 `;
 
 export function Corona() {
   const profile = detectProfile();
+  const material = useRef<THREE.ShaderMaterial>(null);
   const uniforms = useMemo(
     () => ({ uTime: { value: 0 }, uIntensity: { value: 0 }, uStretch: { value: 1 } }),
     [],
@@ -109,15 +126,25 @@ export function Corona() {
   const fragmentShader = useMemo(() => makeFragment(profile.coronaSteps), [profile.coronaSteps]);
 
   useFrame((_, delta) => {
-    uniforms.uTime.value += delta;
-    uniforms.uIntensity.value = sceneState.corona;
-    uniforms.uStretch.value = sceneState.coronaStretch;
+    // Los uniformes se escriben A TRAVES DEL MATERIAL, no sobre el objeto que se
+    // le paso como prop. Cuando el shader se reconstruye, el material acaba con
+    // una copia propia de los uniformes; si sigues mutando el objeto original,
+    // los cambios no llegan nunca y el shader se queda congelado con los valores
+    // que tuviera. Aqui eso dejaba la corona a intensidad casi cero, invisible,
+    // y ninguna subida de ganancia la rescataba porque todo iba multiplicado por
+    // ese cero.
+    const u = material.current?.uniforms;
+    if (!u) return;
+    u.uTime.value += delta;
+    u.uIntensity.value = sceneState.corona;
+    u.uStretch.value = sceneState.coronaStretch;
   });
 
   return (
     <mesh position={[0, 0, -0.2]} renderOrder={-1}>
       <planeGeometry args={[26, 10]} />
       <shaderMaterial
+        ref={material}
         uniforms={uniforms}
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}

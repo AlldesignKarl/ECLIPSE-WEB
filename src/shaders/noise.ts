@@ -6,11 +6,19 @@
  * revelar pixeles.
  */
 export const NOISE_GLSL = /* glsl */ `
+// Los gradientes van NORMALIZADOS. Sin normalizar, su longitud varia entre casi
+// cero y la raiz de tres, el ruido deja de tener media cero y se sesga a
+// positivo; luego cualquier umbral que pongas encima satura en casi todo el
+// campo y la estructura se aplana. Se nota sobre todo en la corona, donde las
+// plumas desaparecen y queda un degradado radial liso.
 vec3 hash33(vec3 p) {
   p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
            dot(p, vec3(269.5, 183.3, 246.1)),
            dot(p, vec3(113.5, 271.9, 124.6)));
-  return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+  vec3 h = -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+  // El epsilon evita el NaN en el caso, improbable pero posible, de que las tres
+  // componentes salgan exactamente a cero.
+  return h / max(length(h), 1e-4);
 }
 
 float gnoise(vec3 p) {

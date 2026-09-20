@@ -23,7 +23,7 @@ export function Effects() {
 
   useFrame(() => {
     if (!bloom.current) return;
-    const base = 0.7 + sceneState.corona * 0.45;
+    const base = 0.42 + sceneState.corona * 0.22;
     // El anillo de diamante es el pico optico de la pieza: multiplica el bloom
     // durante el seis por ciento del scroll que dura.
     const diamond = sceneState.diamond * 2.6;
@@ -37,7 +37,7 @@ export function Effects() {
         ref={bloom}
         mipmapBlur
         intensity={0.9}
-        luminanceThreshold={0.3}
+        luminanceThreshold={0.45}
         luminanceSmoothing={0.22}
         kernelSize={profile.fullPost ? KernelSize.LARGE : KernelSize.MEDIUM}
       />

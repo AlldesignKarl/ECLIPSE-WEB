@@ -62,9 +62,15 @@ export function Photosphere() {
   );
 
   useFrame((_, delta) => {
-    uniforms.uTime.value += delta;
-    uniforms.uIntensity.value = sceneState.photosphere;
-    if (material.current) material.current.visible = sceneState.photosphere > 0.002;
+    // Los uniformes se escriben a traves del material, no sobre el objeto que se
+    // le paso como prop: cuando el shader se reconstruye, el material acaba con
+    // su propia copia y mutar el original deja de tener efecto. Es un fallo
+    // silencioso — compila, no avisa y el shader se queda con valores viejos.
+    const u = material.current?.uniforms;
+    if (!u) return;
+    u.uTime.value += delta;
+    u.uIntensity.value = sceneState.photosphere;
+    material.current!.visible = sceneState.photosphere > 0.002;
   });
 
   return (
@@ -107,17 +113,21 @@ void main() {
 `;
 
 export function Chromosphere() {
+  const material = useRef<THREE.ShaderMaterial>(null);
   const uniforms = useMemo(() => ({ uTime: { value: 0 }, uIntensity: { value: 1 } }), []);
 
   useFrame((_, delta) => {
-    uniforms.uTime.value += delta;
-    uniforms.uIntensity.value = sceneState.photosphere;
+    const u = material.current?.uniforms;
+    if (!u) return;
+    u.uTime.value += delta;
+    u.uIntensity.value = sceneState.photosphere;
   });
 
   return (
     <mesh scale={1.035}>
       <sphereGeometry args={[1, 64, 64]} />
       <shaderMaterial
+        ref={material}
         uniforms={uniforms}
         vertexShader={vertexShader}
         fragmentShader={chromoFragment}

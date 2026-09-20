@@ -110,9 +110,12 @@ export function Smoke() {
   }, [count, offsets, seeds]);
 
   useFrame((_, delta) => {
-    uniforms.uTime.value += delta;
-    uniforms.uSpread.value = sceneState.burst;
-    uniforms.uDensity.value = sceneState.smoke;
+    const u = (mesh.current?.material as THREE.ShaderMaterial | undefined)?.uniforms;
+    if (u) {
+      u.uTime.value += delta;
+      u.uSpread.value = sceneState.burst;
+      u.uDensity.value = sceneState.smoke;
+    }
     if (mesh.current) mesh.current.visible = sceneState.smoke > 0.002;
   });
 

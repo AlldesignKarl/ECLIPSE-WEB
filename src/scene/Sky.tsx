@@ -52,14 +52,17 @@ void main() {
 `;
 
 function Backdrop() {
+  const material = useRef<THREE.ShaderMaterial>(null);
   const uniforms = useMemo(() => ({ uLight: { value: 1 } }), []);
   useFrame(() => {
-    uniforms.uLight.value = sceneState.skyLight;
+    const u = material.current?.uniforms;
+    if (u) u.uLight.value = sceneState.skyLight;
   });
   return (
     <mesh renderOrder={-10}>
       <sphereGeometry args={[60, 32, 32]} />
       <shaderMaterial
+        ref={material}
         uniforms={uniforms}
         vertexShader={backdropVertex}
         fragmentShader={backdropFragment}
