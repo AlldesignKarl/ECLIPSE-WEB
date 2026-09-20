@@ -66,7 +66,7 @@ export function Scene({ onReady, active }: { onReady: () => void; active: boolea
       }}
       onCreated={({ gl, scene }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = 1.04;
+        gl.toneMappingExposure = 0.88;
         scene.background = new THREE.Color('#000000');
       }}
     >

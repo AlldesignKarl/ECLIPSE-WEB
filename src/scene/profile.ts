@@ -22,9 +22,12 @@ export interface Profile {
 }
 
 const PROFILES: Record<Tier, Profile> = {
-  high: { tier: 'high', particles: 180000, smokePlanes: 40, coronaSteps: 32, maxDpr: 2, fullPost: true },
-  mid: { tier: 'mid', particles: 90000, smokePlanes: 28, coronaSteps: 20, maxDpr: 1.75, fullPost: true },
-  low: { tier: 'low', particles: 45000, smokePlanes: 16, coronaSteps: 12, maxDpr: 1.5, fullPost: false },
+  // La corona es el shader mas caro con diferencia: cada muestra recorre cuatro
+  // octavas de ruido por pixel. Bajar sus pasos es lo que mas fps devuelve, y
+  // con la caida ya pronunciada apenas se nota en la imagen.
+  high: { tier: 'high', particles: 120000, smokePlanes: 32, coronaSteps: 18, maxDpr: 2, fullPost: true },
+  mid: { tier: 'mid', particles: 70000, smokePlanes: 22, coronaSteps: 13, maxDpr: 1.6, fullPost: true },
+  low: { tier: 'low', particles: 35000, smokePlanes: 14, coronaSteps: 9, maxDpr: 1.4, fullPost: false },
 };
 
 function rendererString(): string {

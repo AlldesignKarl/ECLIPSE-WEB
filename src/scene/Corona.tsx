@@ -87,20 +87,26 @@ void main() {
 
     // Caida exponencial en lugar de una potencia de 1/r: misma lectura, sin la
     // singularidad que revienta el borde del disco.
-    dens += plume * exp(-(rr - DISC) * 6.5);
+    // Caida mucho mas pronunciada. En una corona real el brillo se desploma al
+    // alejarse del limbo: intensa pegada al disco y muy debil a partir de dos
+    // radios. Con una caida suave las plumas llegan igual de fuertes al borde
+    // del encuadre, y el resultado es un foco, no un eclipse.
+    dens += plume * exp(-(rr - DISC) * 11.0);
   }
   dens /= float(STEPS);
 
   // Recortes: fuera del circulo y dentro del disco no hay corona. Muere sobre
   // los dos radios y medio del disco, que es lo que mide una corona real.
-  float outer = 1.0 - smoothstep(0.30, 0.76, r);
+  float outer = 1.0 - smoothstep(0.26, 0.60, r);
   float inner = smoothstep(DISC * 0.96, DISC * 1.10, r);
   float d = dens * outer * inner;
 
   // Las zonas densas tiran a blanco, las finas al azul del sistema.
-  vec3 cold = vec3(0.30, 0.54, 0.84);
-  vec3 bright = vec3(0.90, 0.96, 1.0);
-  vec3 col = mix(cold, bright, clamp(d * 14.0, 0.0, 1.0));
+  // Blanco perlado, no blanco puro. La corona real tira a marfil con un punto
+  // frio, y ese matiz es buena parte de lo que la hace parecer materia.
+  vec3 cold = vec3(0.34, 0.46, 0.62);
+  vec3 bright = vec3(0.88, 0.90, 0.94);
+  vec3 col = mix(cold, bright, clamp(d * 9.0, 0.0, 1.0));
 
   // El alfa va a UNO, no a d.
   //
@@ -112,7 +118,7 @@ void main() {
   //
   // Ganancia calibrada sobre el valor medido de d: unos 0.10 en el pico junto
   // al disco y 0.006 en el borde exterior.
-  gl_FragColor = vec4(col * d * uIntensity * 1.9 + dither(gl_FragCoord.xy), 1.0);
+  gl_FragColor = vec4(col * d * uIntensity * 0.62 + dither(gl_FragCoord.xy), 1.0);
 }
 `;
 

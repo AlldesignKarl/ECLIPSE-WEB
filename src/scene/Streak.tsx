@@ -40,7 +40,7 @@ void main() {
 
   // Nucleo finisimo con un halo muy ajustado. El grosor crece un poco hacia
   // los extremos, como una llamarada que se abre al alejarse.
-  float thickness = 0.16 + d * 0.30;
+  float thickness = 0.11 + d * 0.20;
   float core = 1.0 - smoothstep(0.0, thickness * 0.34, abs(y));
   float glow = 1.0 - smoothstep(0.0, thickness * 3.2, abs(y));
 
@@ -52,8 +52,8 @@ void main() {
   // Ruido a lo largo: la luz no es un tubo perfecto.
   float grain = 0.72 + 0.42 * smoothstep(-0.2, 0.3, fbm(vec3(x * 5.0, 0.0, uTime * 0.05), 3));
 
-  float i = (core * 3.4 + glow * 0.85) * along * grain * uIntensity;
-  vec3 col = mix(vec3(0.72, 0.84, 1.0), vec3(1.0), clamp(core, 0.0, 1.0));
+  float i = (core * 1.05 + glow * 0.22) * along * grain * uIntensity;
+  vec3 col = mix(vec3(0.62, 0.70, 0.86), vec3(0.95, 0.96, 1.0), clamp(core, 0.0, 1.0));
 
   gl_FragColor = vec4(col * i + dither(gl_FragCoord.xy), 1.0);
 }

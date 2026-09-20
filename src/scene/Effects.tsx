@@ -23,7 +23,7 @@ export function Effects() {
 
   useFrame(() => {
     if (!bloom.current) return;
-    const base = 0.42 + sceneState.corona * 0.22;
+    const base = 0.16 + sceneState.corona * 0.10;
     const blast = sceneState.flash * 0.6 + sceneState.burst * 0.3 * (1 - sceneState.smoke * 0.65);
     bloom.current.intensity = base + blast;
   });
@@ -33,8 +33,8 @@ export function Effects() {
       <Bloom
         ref={bloom}
         mipmapBlur
-        intensity={0.9}
-        luminanceThreshold={0.45}
+        intensity={0.4}
+        luminanceThreshold={0.62}
         luminanceSmoothing={0.22}
         kernelSize={profile.fullPost ? KernelSize.LARGE : KernelSize.MEDIUM}
       />
