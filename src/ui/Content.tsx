@@ -23,13 +23,13 @@ export function Content() {
         </h2>
         <div className="prose">
           <p>
-            La mayoria de las paginas se olvidan antes de cerrarse. Se parecen entre si porque salen
-            de las mismas plantillas, y compiten por atencion con las mismas herramientas que todos
+            La mayoría de las páginas se olvidan antes de cerrarse. Se parecen entre sí porque salen
+            de las mismas plantillas, y compiten por atención con las mismas herramientas que todos
             los demas.
           </p>
           <p>
             Nosotros hacemos la otra clase. El eclipse que acabas de recorrer no es un video ni una
-            imagen: es geometria resolviendose en tiempo real en tu navegador, y reacciona a lo que
+            imagen: es geometría resolviéndose en tiempo real en tu navegador, y reacciona a lo que
             haces. Eso es lo que construimos.
           </p>
         </div>
@@ -39,7 +39,7 @@ export function Content() {
             <h3>Landing de una pagina</h3>
             <p>
               Una sola pieza, pensada para que quien entre no pueda irse sin recordarla. Ideal para
-              lanzamientos, portfolios y productos unicos.
+              lanzamientos, portfolios y productos únicos.
             </p>
             <span className="offer__price">[PRECIO DESDE]</span>
           </li>
@@ -54,7 +54,7 @@ export function Content() {
           <li>
             <h3>Experiencia a medida</h3>
             <p>
-              3D, animacion y scroll cinematografico, como esta. Para marcas que necesitan que no se
+              3D, animación y scroll cinematográfico, como esta. Para marcas que necesitan que no se
               les parezca nadie.
             </p>
             <span className="offer__price">[PRECIO DESDE]</span>
@@ -73,8 +73,8 @@ export function Content() {
             <div>
               <h3>Hablamos</h3>
               <p>
-                Nos cuentas que vendes y a quien. Salimos de ahi con una propuesta cerrada: que
-                incluye, cuanto cuesta y cuando esta. Sin sorpresas despues.
+                Nos cuentas qué vendes y a quién. Salimos de ahí con una propuesta cerrada: qué
+                incluye, cuánto cuesta y cuándo está. Sin sorpresas después.
               </p>
             </div>
           </li>
@@ -83,8 +83,8 @@ export function Content() {
             <div>
               <h3>Lo ves antes de pagarlo entero</h3>
               <p>
-                Te ensenamos una version navegable en cuanto hay algo que ensenar. Si el rumbo no es
-                el que esperabas, se corrige ahi y no al final.
+                Te enseñamos una versión navegable en cuanto hay algo que enseñar. Si el rumbo no es
+                el que esperabas, se corrige ahí y no al final.
               </p>
             </div>
           </li>
@@ -93,7 +93,7 @@ export function Content() {
             <div>
               <h3>Publicamos y te lo entregamos</h3>
               <p>
-                Dominio, alojamiento y puesta en marcha. La web queda a tu nombre y con el codigo en
+                Dominio, alojamiento y puesta en marcha. La web queda a tu nombre y con el código en
                 tu poder: no te quedas atado a nosotros.
               </p>
             </div>
@@ -104,23 +104,23 @@ export function Content() {
       <section className="section" id="trabajos">
         <p className="kicker">03 — Trabajos</p>
         <h2>
-          <strong>Lo ultimo</strong> <em>que hemos hecho</em>
+          <strong>Lo último</strong> <em>que hemos hecho</em>
         </h2>
         <ul className="archive">
           <li>
             <span className="archive__year">[AÑO]</span>
             <h3>[NOMBRE DEL CLIENTE]</h3>
-            <p>[QUE SE HIZO, EN UNA LINEA]</p>
+            <p>[QUÉ SE HIZO, EN UNA LÍNEA]</p>
           </li>
           <li>
             <span className="archive__year">[AÑO]</span>
             <h3>[NOMBRE DEL CLIENTE]</h3>
-            <p>[QUE SE HIZO, EN UNA LINEA]</p>
+            <p>[QUÉ SE HIZO, EN UNA LÍNEA]</p>
           </li>
           <li>
             <span className="archive__year">[AÑO]</span>
             <h3>[NOMBRE DEL CLIENTE]</h3>
-            <p>[QUE SE HIZO, EN UNA LINEA]</p>
+            <p>[QUÉ SE HIZO, EN UNA LÍNEA]</p>
           </li>
         </ul>
       </section>
@@ -172,7 +172,7 @@ function Contact() {
         </div>
 
         <h2 className="panel__title">
-          <strong>Cuentanos</strong> <em>tu proyecto</em>
+          <strong>Cuéntanos</strong> <em>tu proyecto</em>
         </h2>
         <p className="panel__sub">Respondemos en menos de 48 horas</p>
 
@@ -182,7 +182,7 @@ function Contact() {
         </div>
 
         <div className="field">
-          <label htmlFor="project">Que necesitas</label>
+          <label htmlFor="project">Qué necesitas</label>
           <textarea
             id="project"
             name="project"
@@ -194,7 +194,7 @@ function Contact() {
 
         <button type="submit">Enviar</button>
         <p className="panel__foot" role="status">
-          {sent ? 'Se ha abierto tu correo. Si no, escribenos a ' : 'O escribenos directamente a '}
+          {sent ? 'Se ha abierto tu correo. Si no, escríbenos a ' : 'O escríbenos directamente a '}
           <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
         </p>
       </form>

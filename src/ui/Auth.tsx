@@ -6,12 +6,12 @@ import { useState } from 'react';
  * ATENCION — ESTO ES INTERFAZ, NO AUTENTICACION.
  *
  * No hay servidor detras: no se crean cuentas, no se comprueba ninguna
- * contrasena y no se protege absolutamente nada. Cualquiera puede saltarselo
+ * contraseña y no se protege absolutamente nada. Cualquiera puede saltarselo
  * borrando una clave del navegador, y hasta que no haya un proveedor de
  * identidad de verdad (Supabase, Clerk, Auth0, Firebase o el que sea) seguira
  * siendo asi.
  *
- * Por eso la contrasena NO se guarda ni se envia a ningun sitio: se queda en el
+ * Por eso la contraseña NO se guarda ni se envia a ningun sitio: se queda en el
  * estado del componente y muere al salir. Guardar credenciales en el navegador
  * sin backend seria peor que no tener acceso.
  */
@@ -77,7 +77,7 @@ export function Auth({ onEnter }: { onEnter: () => void }) {
         <p className="auth__sub">
           {entrar
             ? 'Accede al seguimiento de tu proyecto, tus archivos y tus facturas'
-            : 'Te damos acceso al seguimiento de tu proyecto desde el primer dia'}
+            : 'Te damos acceso al seguimiento de tu proyecto desde el primer día'}
         </p>
 
         <div className="auth__tabs" role="group" aria-label="Entrar o crear cuenta">
@@ -119,7 +119,7 @@ export function Auth({ onEnter }: { onEnter: () => void }) {
         </div>
 
         <div className="field">
-          <label htmlFor="auth-password">Contrasena</label>
+          <label htmlFor="auth-password">Contraseña</label>
           <div className="field__wrap">
             <input
               id="auth-password"
@@ -133,7 +133,7 @@ export function Auth({ onEnter }: { onEnter: () => void }) {
             <button
               type="button"
               className="field__reveal"
-              aria-label={reveal ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+              aria-label={reveal ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               aria-pressed={reveal}
               onClick={() => setReveal((v) => !v)}
             >
@@ -146,10 +146,10 @@ export function Auth({ onEnter }: { onEnter: () => void }) {
           <div className="auth__row">
             <label className="check">
               <input type="checkbox" name="remember" defaultChecked />
-              <span>No cerrar sesion</span>
+              <span>No cerrar sesión</span>
             </label>
             <a href="#contacto" onClick={onEnter}>
-              He olvidado la contrasena
+              He olvidado la contraseña
             </a>
           </div>
         )}
@@ -167,7 +167,7 @@ export function Auth({ onEnter }: { onEnter: () => void }) {
         </button>
 
         <p className="auth__foot">
-          {entrar ? '¿Todavia no tienes cuenta? ' : '¿Ya tienes cuenta? '}
+          {entrar ? '¿Todavía no tienes cuenta? ' : '¿Ya tienes cuenta? '}
           <button type="button" onClick={() => setMode(entrar ? 'crear' : 'entrar')}>
             {entrar ? 'Crear una' : 'Entrar'}
           </button>

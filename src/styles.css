@@ -857,24 +857,23 @@ a:hover {
   transform: translateY(-1px);
 }
 
+/* Dos filetes con el texto en medio. Tapar una linea continua con un fondo
+   solido funciona sobre un color plano, pero aqui el panel es translucido y el
+   parche se ve: quedaba una cajita negra flotando en mitad del separador. */
 .auth__or {
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
   margin: 20px 0;
-  text-align: center;
 }
-.auth__or::before {
+.auth__or::before,
+.auth__or::after {
   content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
+  flex: 1 1 0;
   height: 1px;
   background: var(--line-soft);
 }
 .auth__or span {
-  position: relative;
-  padding: 0 12px;
-  background: rgba(8, 10, 15, 0.98);
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.2em;
@@ -976,6 +975,19 @@ a:hover {
   .footer {
     flex-direction: column;
     gap: 8px;
+  }
+}
+
+@media (max-width: 430px) {
+  /* En vertical los dos enlaces de la fila se parten en dos lineas cada uno y
+     se pisan. Apilados caben enteros y se tocan mejor con el pulgar. */
+  .auth__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .auth__panel {
+    padding: 28px 22px 26px;
   }
 }
 

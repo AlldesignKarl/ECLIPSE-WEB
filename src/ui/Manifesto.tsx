@@ -6,7 +6,7 @@ import { useScrollBind } from './useScrollBind';
 // justo cuando el usuario acaba de quedarse mirando algo que no esperaba. No
 // describe el eclipse — lo convierte en argumento.
 const TEXT =
-  'Esto no es un video. Es una pagina web funcionando en tu navegador ahora mismo. Asi trabajamos.';
+  'Esto no es un vídeo. Es una página web funcionando en tu navegador ahora mismo. Así trabajamos.';
 
 /**
  * El manifiesto.

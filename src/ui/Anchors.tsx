@@ -29,7 +29,7 @@ export function Anchors() {
       </nav>
 
       <p className="anchor anchor--tr">
-        Estudio de diseno
+        Estudio de diseño
         <br />y desarrollo web
       </p>
 
@@ -45,7 +45,7 @@ export function Anchors() {
       </div>
 
       <p className="anchor anchor--br">
-        Diseno, desarrollo y animacion.
+        Diseño, desarrollo y animación.
         <br />
         De la idea al dominio, sin intermediarios.
       </p>
