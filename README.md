@@ -71,12 +71,45 @@ materia de animacion.
 sacrifica realismo estricto para que el estallido azul del final se sienta
 prometido en lugar de arbitrario.
 
-## Herramienta de direccion
+## Herramientas de direccion
+
+Sin estas dos, los fallos de mas abajo no se encuentran. No son andamios: se
+quedan en el codigo.
 
 `?t=0.68` congela la pieza en ese fotograma exacto, sin amortiguamiento. Sirve
 para sacar capturas de cualquier estado y para afinar sin pelearse con el
 scroll: en una maquina lenta el amortiguamiento no converge nunca, y acabas
 juzgando un fotograma que no es el que crees estar viendo.
+
+`?q=low`, `?q=mid` o `?q=high` fuerzan un perfil de dispositivo. Sirve para ver
+la gama baja sin tener un movil delante, y para capturar en maquinas sin GPU,
+donde el perfil alto tarda mas de medio minuto por fotograma.
+
+En desarrollo, `window.__eclipse` expone el estado de la escena en vivo. Leer un
+valor es siempre mejor que deducirlo de lo que se ve en pantalla.
+
+## Cuatro trampas que ya costaron caras
+
+Las cuatro compilan sin avisos, pasan el typecheck y no lanzan ni un error de
+consola. Solo se encuentran mirando la pieza.
+
+**Los uniformes se escriben a traves del material**, nunca sobre el objeto que
+se le paso como prop. Cuando el shader se reconstruye, el material acaba con su
+propia copia y mutar el original deja de tener efecto. Esto tuvo la corona
+invisible durante horas, con la intensidad congelada en 0.044: como todo va
+multiplicado por ella, subir la ganancia no cambiaba ni un pixel.
+
+**`smoothstep` siempre con los bordes en orden ascendente.** Al reves es
+comportamiento indefinido en GLSL: funciona en unos drivers y devuelve cero en
+otros. Tenia corona, particulas y humo invisibles a la vez.
+
+**Los colores de los shaders son LINEALES, no sRGB.** El negro del sistema,
+`#06070A`, es aproximadamente `0.0018` lineal. Escribir `0.0075` pensando en
+sRGB da un gris azulado bien visible.
+
+**Los gradientes del hash van normalizados.** Sin normalizar, el ruido pierde la
+media cero y se sesga; cualquier umbral que pongas encima satura en casi todo el
+campo y la estructura se aplana.
 
 ## Rendimiento
 

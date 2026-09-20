@@ -41,8 +41,26 @@ function rendererString(): string {
 
 let cached: Profile | null = null;
 
+/**
+ * `?q=low`, `?q=mid` o `?q=high` fuerzan un perfil.
+ *
+ * Sirve para ver como queda la pieza en gama baja sin tener un movil delante, y
+ * para poder capturarla en maquinas sin GPU, donde el perfil alto tarda mas de
+ * medio minuto por fotograma.
+ */
+function forcedTier(): Tier | null {
+  const q = new URLSearchParams(window.location.search).get('q');
+  return q === 'low' || q === 'mid' || q === 'high' ? q : null;
+}
+
 export function detectProfile(): Profile {
   if (cached) return cached;
+
+  const forced = forcedTier();
+  if (forced) {
+    cached = PROFILES[forced];
+    return cached;
+  }
 
   const coarse = window.matchMedia('(pointer: coarse)').matches;
   const narrow = Math.min(window.innerWidth, window.innerHeight) < 820;
