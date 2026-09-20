@@ -27,7 +27,7 @@ export function Effects() {
     // El anillo de diamante es el pico optico de la pieza: multiplica el bloom
     // durante el seis por ciento del scroll que dura.
     const diamond = sceneState.diamond * 2.6;
-    const blast = sceneState.flash * 1.4 + sceneState.burst * 0.5 * (1 - sceneState.smoke * 0.65);
+    const blast = sceneState.flash * 0.35 + sceneState.burst * 0.3 * (1 - sceneState.smoke * 0.65);
     bloom.current.intensity = base + diamond + blast;
   });
 

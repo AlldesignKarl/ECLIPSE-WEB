@@ -52,16 +52,25 @@ void main() {
   float r = length(p) * 2.0;
   if (r > 1.0) discard;
 
-  float n = fbm(vec3(p * 2.4 + vSeed.xy * 17.0, uTime * 0.035 + vSeed.z * 9.0), 4);
+  // Dos escalas de ruido y mucho contraste. Con poco contraste, dieciseis planos
+  // superpuestos se promedian entre si y el resultado es niebla plana: hace
+  // falta que haya zonas densas y zonas vacias para que se lea el volumen.
+  float coarse = fbm(vec3(p * 1.5 + vSeed.xy * 17.0, uTime * 0.02 + vSeed.z * 9.0), 3);
+  float fine = fbm(vec3(p * 4.2 + vSeed.xy * 31.0, uTime * 0.05 + vSeed.z * 4.0), 4);
+  float n = coarse * 0.7 + fine * 0.3;
+
   float body = 1.0 - smoothstep(0.05, 1.0, r);
-  float a = body * clamp(0.32 + n * 0.95, 0.0, 1.0) * uDensity;
+  // smoothstep en vez de clamp: recorta los medios tonos y deja jirones en
+  // lugar de una sabana uniforme.
+  float density = smoothstep(0.02, 0.46, 0.30 + n);
+  float a = body * density * uDensity;
 
   // Azul claro donde el humo es denso, azul de sombra donde se deshilacha: el
   // volumen sale de esa diferencia, no de una textura.
   // Valores LINEALES: 0.22 aqui se ve como un 0.50 en pantalla.
-  vec3 col = mix(vec3(0.012, 0.024, 0.045), vec3(0.22, 0.42, 0.66), clamp(n * 0.7 + 0.5, 0.0, 1.0));
+  vec3 col = mix(vec3(0.008, 0.016, 0.032), vec3(0.11, 0.24, 0.42), clamp(n * 1.3 + 0.5, 0.0, 1.0));
 
-  gl_FragColor = vec4(col, a * 0.26);
+  gl_FragColor = vec4(col, a * 0.17);
 }
 `;
 
