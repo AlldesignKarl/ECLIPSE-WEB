@@ -67,28 +67,36 @@ void main() {
   float dens = 0.0;
   for (int i = 0; i < ${steps}; i++) {
     float fi = (float(i) + 0.5) / float(STEPS);
-    float rr = r * (0.80 + fi * 0.40);
+    float rr = r * (0.82 + fi * 0.36);
 
-    float n = fbm(ray * (2.1 + rr * 3.6) + vec3(0.0, 0.0, uTime * 0.02), 4);
-    float plume = pow(max(0.0, 0.42 + n * 0.98), 2.6);
+    // Dos escalas angulares. La baja dibuja las plumas grandes, que son las que
+    // dan la silueta; la alta, el hilado fino de dentro de cada una.
+    float coarse = fbm(ray * 2.3 + vec3(0.0, 0.0, uTime * 0.012), 2);
+    float fine = fbm(ray * (5.5 + rr * 6.0) + vec3(0.0, 0.0, uTime * 0.02), 4);
+
+    // smoothstep en lugar de pow: acota el resultado a [0,1] pase lo que pase
+    // con el ruido. Con pow, un pico del ruido dispara el valor, todo satura y
+    // la corona se convierte en un lavado plano sin estructura.
+    float plume = smoothstep(-0.12, 0.42, fine) * (0.30 + 0.95 * smoothstep(-0.20, 0.34, coarse));
 
     // Caida exponencial en lugar de una potencia de 1/r: misma lectura, sin la
     // singularidad que revienta el borde del disco.
-    dens += plume * exp(-(rr - DISC) * 5.0);
+    dens += plume * exp(-(rr - DISC) * 15.0);
   }
   dens /= float(STEPS);
 
-  // Recortes: fuera del circulo y dentro del disco no hay corona.
-  float outer = 1.0 - smoothstep(0.46, 1.0, r);
-  float inner = smoothstep(DISC * 0.94, DISC * 1.14, r);
+  // Recortes: fuera del circulo y dentro del disco no hay corona. Muere sobre
+  // los dos radios y medio del disco, que es lo que mide una corona real.
+  float outer = 1.0 - smoothstep(0.30, 0.68, r);
+  float inner = smoothstep(DISC * 0.96, DISC * 1.10, r);
   float d = dens * outer * inner;
 
   // Las zonas densas tiran a blanco, las finas al azul del sistema.
-  vec3 cold = vec3(0.34, 0.57, 0.85);
-  vec3 bright = vec3(0.88, 0.95, 1.0);
-  vec3 col = mix(cold, bright, clamp(d * 3.4, 0.0, 1.0));
+  vec3 cold = vec3(0.30, 0.54, 0.84);
+  vec3 bright = vec3(0.90, 0.96, 1.0);
+  vec3 col = mix(cold, bright, clamp(d * 5.0, 0.0, 1.0));
 
-  gl_FragColor = vec4(col * d * uIntensity * 5.2 + dither(gl_FragCoord.xy), clamp(d * uIntensity * 3.0, 0.0, 1.0));
+  gl_FragColor = vec4(col * d * uIntensity * 3.4 + dither(gl_FragCoord.xy), clamp(d * uIntensity * 4.0, 0.0, 1.0));
 }
 `;
 

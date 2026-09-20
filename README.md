@@ -71,6 +71,13 @@ materia de animacion.
 sacrifica realismo estricto para que el estallido azul del final se sienta
 prometido en lugar de arbitrario.
 
+## Herramienta de direccion
+
+`?t=0.68` congela la pieza en ese fotograma exacto, sin amortiguamiento. Sirve
+para sacar capturas de cualquier estado y para afinar sin pelearse con el
+scroll: en una maquina lenta el amortiguamiento no converge nunca, y acabas
+juzgando un fotograma que no es el que crees estar viendo.
+
 ## Rendimiento
 
 Tres perfiles decididos al arrancar a partir de la GPU, los nucleos, la memoria

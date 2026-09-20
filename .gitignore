@@ -5,3 +5,5 @@ dist
 .vite
 .shoot.mjs
 .probe.mjs
+.freeze.mjs
+.diag.mjs

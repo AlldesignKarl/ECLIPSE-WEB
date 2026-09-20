@@ -20,6 +20,23 @@ export const scroll = {
   reduced: false,
 };
 
+/**
+ * Congelar la pieza en un fotograma exacto: `?t=0.68`.
+ *
+ * Es la herramienta de direccion. Sirve para sacar capturas exactas de
+ * cualquier estado sin pelearse con el amortiguamiento, y es imprescindible
+ * para afinar: si esperas a que el scroll converja, en una maquina lenta nunca
+ * converge y acabas juzgando un fotograma que no es el que crees.
+ */
+function frozenT(): number | null {
+  const raw = new URLSearchParams(window.location.search).get('t');
+  if (raw === null) return null;
+  const value = Number(raw);
+  return Number.isFinite(value) ? clamp01(value) : null;
+}
+
+let frozen: number | null = null;
+
 /** Los cuatro estados que se sirven cuando el sistema pide movimiento reducido. */
 const REDUCED_STEPS = [0, 0.3, 0.68, 0.94];
 
@@ -41,6 +58,15 @@ function loop(now: number) {
   // escena entera de golpe.
   const dt = last ? Math.min((now - last) / 1000, 0.05) : 1 / 60;
   last = now;
+
+  if (frozen !== null) {
+    scroll.raw = frozen;
+    scroll.t = frozen;
+    updateSceneState(scroll.t);
+    for (const listener of listeners) listener(scroll.t, dt);
+    frame = requestAnimationFrame(loop);
+    return;
+  }
 
   scroll.raw = readRaw();
 
@@ -68,8 +94,10 @@ export function attachStage(el: HTMLElement | null) {
   stageEl = el;
   if (el && !frame) {
     scroll.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    scroll.raw = readRaw();
+    frozen = frozenT();
+    scroll.raw = frozen ?? readRaw();
     scroll.t = scroll.raw;
+    updateSceneState(scroll.t);
     frame = requestAnimationFrame(loop);
   }
   if (!el && frame) {
