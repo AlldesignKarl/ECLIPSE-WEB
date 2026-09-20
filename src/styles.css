@@ -1,0 +1,706 @@
+/* ECLIPSE — sistema visual.
+   Oscuro, frio, con una brasa que se apaga. Un unico acento azul sostiene el
+   sistema; el ambar solo existe mientras hay sol. */
+
+:root {
+  --ground: #06070a;
+  --panel: rgba(10, 12, 18, 0.72);
+  --line: #1b2230;
+  --line-soft: #141a26;
+  --ink: #ecf1f8;
+  --ink-2: #9aa7ba;
+  --ink-3: #8794a8;
+  --blue: #8fc7f2;
+  --blue-dim: #2a4c6e;
+
+  --sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --gutter: clamp(20px, 4vw, 56px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--ground);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(143, 199, 242, 0.25);
+  color: #fff;
+}
+
+a {
+  color: var(--blue);
+  text-decoration: none;
+}
+a:hover {
+  color: #bfe0fa;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip {
+  position: fixed;
+  top: -100px;
+  left: var(--gutter);
+  z-index: 200;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--ground);
+  border-radius: 8px;
+  font-size: 13px;
+  transition: top 0.18s ease;
+}
+.skip:focus {
+  top: 14px;
+  color: var(--ground);
+}
+
+/* --- el lienzo -------------------------------------------------------- */
+
+.canvasHolder {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+.canvasHolder canvas {
+  display: block;
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.stage__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  height: 100dvh;
+}
+
+/* --- las cuatro anclas de esquina -------------------------------------- */
+
+.anchors {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.anchor {
+  position: absolute;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  line-height: 1.7;
+  color: var(--ink-3);
+}
+
+.anchor--tl {
+  top: var(--gutter);
+  left: var(--gutter);
+  display: flex;
+  gap: 22px;
+  pointer-events: auto;
+}
+.anchor--tl a {
+  color: var(--ink-3);
+}
+.anchor--tl a:hover {
+  color: var(--ink);
+}
+
+.anchor--tr {
+  top: var(--gutter);
+  right: var(--gutter);
+  text-align: right;
+}
+
+.anchor--bl {
+  bottom: var(--gutter);
+  left: var(--gutter);
+}
+.anchor--bl p {
+  margin: 0 0 12px;
+}
+.anchor__link {
+  pointer-events: auto;
+  color: var(--blue);
+}
+
+.anchor--br {
+  bottom: var(--gutter);
+  right: var(--gutter);
+  text-align: right;
+  max-width: 300px;
+  opacity: 0.62;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: 10.5px;
+}
+
+/* --- el manifiesto ------------------------------------------------------ */
+
+.manifesto {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(720px, calc(100% - var(--gutter) * 2));
+  margin: 0;
+  text-align: center;
+  font-size: clamp(17px, 2.1vw, 27px);
+  font-weight: 200;
+  line-height: 1.52;
+  letter-spacing: 0.005em;
+  color: #eef4fb;
+  text-shadow: 0 2px 30px rgba(4, 8, 16, 0.85);
+}
+.manifesto span {
+  display: inline-block;
+  opacity: 0;
+  white-space: pre;
+  will-change: opacity, transform, filter;
+}
+
+/* --- el indicador de scroll --------------------------------------------- */
+
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--gutter) + 6px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.hint i {
+  display: block;
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(to bottom, rgba(143, 199, 242, 0.7), rgba(143, 199, 242, 0));
+}
+
+/* --- preloader ---------------------------------------------------------- */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: var(--ground);
+  transition: opacity 0.8s ease;
+}
+.preloader--out {
+  opacity: 0;
+  pointer-events: none;
+}
+.preloader__light {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 20px 4px rgba(214, 238, 255, 0.6);
+  transition:
+    width 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.9s ease;
+}
+.preloader__light--full {
+  width: 96px;
+  height: 96px;
+  box-shadow: 0 0 90px 22px rgba(255, 214, 160, 0.45);
+}
+.preloader__label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* --- poster sin WebGL --------------------------------------------------- */
+
+.poster {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: var(--gutter);
+}
+.poster__scene {
+  position: relative;
+  width: min(300px, 55vw);
+  aspect-ratio: 1;
+}
+.poster__corona {
+  position: absolute;
+  inset: -58%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(212, 236, 255, 0) 30%,
+    rgba(212, 236, 255, 0.3) 33%,
+    rgba(143, 199, 242, 0.08) 45%,
+    rgba(6, 7, 10, 0) 68%
+  );
+  animation: breathe 9s ease-in-out infinite;
+}
+.poster__disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #04050a;
+  box-shadow:
+    0 0 0 1.5px rgba(219, 240, 255, 0.7),
+    0 0 44px 4px rgba(190, 225, 255, 0.45);
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+.poster__word {
+  margin: -8% 0 0;
+  font-size: clamp(38px, 11vw, 116px);
+  font-weight: 200;
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  color: #f4f8fd;
+  text-shadow: 0 0 60px rgba(150, 200, 245, 0.35);
+}
+.poster__sub {
+  margin: 26px 0 0;
+  max-width: 520px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+/* --- contenido ---------------------------------------------------------- */
+
+.content {
+  position: relative;
+  z-index: 2;
+}
+
+.section {
+  padding: clamp(80px, 12vh, 150px) var(--gutter);
+  margin: 0 auto;
+  max-width: 1180px;
+}
+
+/* La primera seccion entra sobre el humo y deja que sangre dentro de ella:
+   las secciones se unen por la materia, no por un fundido. */
+.section--first {
+  background: linear-gradient(
+    to bottom,
+    rgba(6, 7, 10, 0) 0%,
+    rgba(6, 7, 10, 0.72) 26%,
+    rgba(6, 7, 10, 0.97) 62%,
+    var(--ground) 100%
+  );
+  max-width: none;
+  padding-top: clamp(140px, 26vh, 300px);
+}
+.section--first > * {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.section:not(.section--first) {
+  background: var(--ground);
+  max-width: none;
+}
+.section:not(.section--first) > * {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.kicker {
+  margin: 0 0 22px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* Titular de peso mixto: 500 en marfil mas 200 en azul. Viene de la captura,
+   y jerarquiza sin necesidad de subir el tamano. */
+.section h2 {
+  margin: 0 0 36px;
+  font-size: clamp(30px, 4.6vw, 62px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 200;
+}
+.section h2 strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.section h2 em {
+  font-style: normal;
+  font-weight: 200;
+  color: var(--blue);
+}
+
+.prose {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+  max-width: 900px;
+}
+.prose p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+
+.acts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line-soft);
+}
+.acts li {
+  display: flex;
+  gap: clamp(20px, 4vw, 54px);
+  padding: 26px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.acts__n {
+  flex: 0 0 auto;
+  width: 46px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--blue);
+  padding-top: 5px;
+}
+.acts h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.acts p {
+  margin: 0;
+  max-width: 640px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.archive {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.archive li {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #0c1017;
+}
+.archive__year {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--ink-3);
+}
+.archive h3 {
+  margin: 12px 0 8px;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.archive p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+/* --- el panel de cristal ahumado ---------------------------------------- */
+
+.section--contact {
+  display: flex;
+  justify-content: center;
+}
+
+.panel {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 30px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  /* La luz de canto: un pixel superior mas claro que el resto del borde. Es lo
+     unico que hace que el panel parezca tener grosor. */
+  border-top-color: rgba(143, 199, 242, 0.28);
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.panel__glyph {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.panel__glyph span {
+  position: relative;
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.4px solid rgba(143, 199, 242, 0.85);
+  box-shadow: 0 0 16px 2px rgba(143, 199, 242, 0.32);
+}
+.panel__glyph span::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: -1.4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #0a0c12;
+}
+
+.panel__title {
+  margin: 0;
+  text-align: center;
+  font-size: 27px;
+  line-height: 1.15;
+  font-weight: 200;
+}
+.panel__title strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.panel__title em {
+  font-style: normal;
+  color: var(--blue);
+}
+.panel__sub {
+  margin: 10px 0 26px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.field {
+  margin-bottom: 16px;
+}
+.field label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 12px 13px;
+  min-height: 44px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #222b3a;
+  border-radius: 9px;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 300;
+  resize: vertical;
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #6f7c8f;
+}
+/* El foco sube la luminosidad del borde en lugar de cambiar su color: en una
+   pieza oscura, la jerarquia se hace con luz. */
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: rgba(143, 199, 242, 0.55);
+  background: rgba(143, 199, 242, 0.05);
+}
+
+.panel button {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+  border: 0;
+  border-radius: 9px;
+  background: #f4f8fd;
+  color: var(--ground);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.14s ease, background 0.14s ease;
+}
+.panel button:hover {
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.panel__foot {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 11px;
+  color: #6f7c8f;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 30px var(--gutter);
+  border-top: 1px solid var(--line-soft);
+  background: var(--ground);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* --- suciedad optica permanente ----------------------------------------- */
+
+/* Grano y vineta cubren tambien las secciones de contenido, no solo el lienzo:
+   si se cortaran al salir de la escena, el cambio se notaria al instante. */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grainShift 0.7s steps(3) infinite;
+}
+@keyframes grainShift {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-2%, 1%);
+  }
+  66% {
+    transform: translate(1%, -2%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 91;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(6, 7, 10, 0) 48%, rgba(6, 7, 10, 0.55) 100%);
+}
+
+/* --- vertical ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+  .anchor--br {
+    display: none;
+  }
+  .anchor--tl {
+    gap: 14px;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+  /* El manifiesto baja al tercio inferior: en vertical la camara sube el disco
+     y el texto ocupa el hueco que queda debajo. */
+  .manifesto {
+    top: auto;
+    bottom: 22%;
+    transform: translate(-50%, 0);
+  }
+  .footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .grain {
+    animation: none;
+  }
+  .poster__corona {
+    animation: none;
+  }
+  .manifesto span {
+    filter: none !important;
+    transform: none !important;
+  }
+  .preloader__light {
+    transition: none;
+  }
+}
