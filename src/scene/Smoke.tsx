@@ -30,9 +30,11 @@ void main() {
 
   // El humo crece por encima del encuadre: que salga de plano es lo que da la
   // sensacion de estar dentro y no mirandolo de lejos.
-  vec3 p = position * (1.0 + uSpread * (1.3 + aSeed.z * 2.8));
+  // El crecimiento se contiene a proposito: una nube que cubre el encuadre
+  // entero no tiene silueta, y sin silueta no hay volumen, solo niebla.
+  vec3 p = position * (1.0 + uSpread * (0.5 + aSeed.z * 1.3));
   vec4 local = instanceMatrix * vec4(p, 1.0);
-  local.xyz += aOffset * uSpread * 3.4;
+  local.xyz += aOffset * uSpread * 2.4;
   local.y += uSpread * uSpread * 1.6;
 
   gl_Position = projectionMatrix * modelViewMatrix * local;
@@ -62,7 +64,7 @@ void main() {
   float body = 1.0 - smoothstep(0.05, 1.0, r);
   // smoothstep en vez de clamp: recorta los medios tonos y deja jirones en
   // lugar de una sabana uniforme.
-  float density = smoothstep(0.02, 0.46, 0.30 + n);
+  float density = smoothstep(0.06, 0.40, 0.28 + n);
   float a = body * density * uDensity;
 
   // Azul claro donde el humo es denso, azul de sombra donde se deshilacha: el
@@ -70,7 +72,7 @@ void main() {
   // Valores LINEALES: 0.22 aqui se ve como un 0.50 en pantalla.
   vec3 col = mix(vec3(0.008, 0.016, 0.032), vec3(0.11, 0.24, 0.42), clamp(n * 1.3 + 0.5, 0.0, 1.0));
 
-  gl_FragColor = vec4(col, a * 0.17);
+  gl_FragColor = vec4(col, a * 0.30);
 }
 `;
 

@@ -22,32 +22,32 @@ export function Anchors() {
   return (
     <div className="anchors" ref={root} aria-hidden="true">
       <nav className="anchor anchor--tl">
-        <a href="#estudio">Estudio</a>
+        <a href="#servicios">Servicios</a>
         <a href="#proceso">Proceso</a>
-        <a href="#archivo">Archivo</a>
+        <a href="#trabajos">Trabajos</a>
         <a href="#contacto">Contacto</a>
       </nav>
 
       <p className="anchor anchor--tr">
-        La unica sombra
-        <br />
-        que se puede mirar
+        Estudio de diseno
+        <br />y desarrollo web
       </p>
 
       <div className="anchor anchor--bl">
         <p>
-          La luz tambien
+          Hacemos webs que
           <br />
-          tiene materia
+          no se parecen a nada
         </p>
-        <a className="anchor__link" href="#estudio">
-          Ver el archivo <span aria-hidden="true">&#8599;</span>
+        <a className="anchor__link" href="#servicios">
+          Ver servicios <span aria-hidden="true">&#8599;</span>
         </a>
       </div>
 
       <p className="anchor anchor--br">
-        Un cuerpo que se apaga, se convierte en luz,
-        <br />y la luz se convierte en materia.
+        Diseno, desarrollo y animacion.
+        <br />
+        De la idea al dominio, sin intermediarios.
       </p>
     </div>
   );

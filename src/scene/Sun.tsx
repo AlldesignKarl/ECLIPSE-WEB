@@ -77,7 +77,7 @@ export function Photosphere() {
     if (!u) return;
     u.uTime.value += delta;
     u.uIntensity.value = sceneState.photosphere;
-    u.uCool.value = sceneState.cracks;
+    u.uCool.value = sceneState.cool;
     material.current!.visible = sceneState.photosphere > 0.002;
   });
 

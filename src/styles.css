@@ -446,6 +446,47 @@ a:hover {
   color: var(--ink-2);
 }
 
+/* Los tres servicios. Es la seccion que tiene que vender, asi que las tarjetas
+   pesan mas que las del archivo: mas aire, precio destacado abajo. */
+.offer {
+  list-style: none;
+  margin: 44px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.offer li {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 26px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #0c1017;
+}
+.offer h3 {
+  margin: 0 0 12px;
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.offer p {
+  margin: 0 0 24px;
+  flex-grow: 1;
+  font-size: 14px;
+  line-height: 1.62;
+  color: var(--ink-2);
+}
+.offer__price {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--blue);
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
 .archive {
   list-style: none;
   margin: 0;

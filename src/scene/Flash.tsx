@@ -41,14 +41,14 @@ void main() {
   // oscuro alrededor, no por cantidad de luz: si el halo llega a las esquinas,
   // se come el negro y con el negro se va el sistema entero.
   float core = pow(1.0 - smoothstep(0.0, 0.22, r), 3.2);
-  float halo = pow(1.0 - smoothstep(0.0, 0.46, r), 2.8);
+  float halo = pow(1.0 - smoothstep(0.0, 0.58, r), 2.6);
 
   // Rayos: rompen el circulo perfecto, que siempre delata un sprite.
   float a = atan(p.y, p.x);
   float rays = fbm(vec3(cos(a), sin(a), 0.0) * 4.0 + vec3(0.0, 0.0, uTime * 0.05), 3);
   halo *= 0.55 + 0.75 * smoothstep(-0.15, 0.25, rays);
 
-  float i = (core * 0.85 + halo * 0.16) * uFlash;
+  float i = (core * 1.5 + halo * 0.34) * uFlash;
   vec3 col = mix(vec3(0.62, 0.80, 1.0), vec3(1.0), clamp(core * 1.6, 0.0, 1.0));
 
   gl_FragColor = vec4(col * i + dither(gl_FragCoord.xy), 1.0);
@@ -70,14 +70,14 @@ export function Flash() {
       mesh.current.visible = sceneState.flash > 0.003;
       // Crece con el propio golpe: al nacer es un punto, al apagarse ya ha
       // barrido el encuadre.
-      const s = 1 + sceneState.burst * 1.5;
+      const s = 1 + sceneState.burst * 1.9;
       mesh.current.scale.setScalar(s);
     }
   });
 
   return (
     <mesh ref={mesh} position={[0, 0, 0.35]} renderOrder={1}>
-      <planeGeometry args={[5, 5]} />
+      <planeGeometry args={[6, 6]} />
       <shaderMaterial
         ref={material}
         uniforms={uniforms}

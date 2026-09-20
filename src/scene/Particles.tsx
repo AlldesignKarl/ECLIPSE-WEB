@@ -67,7 +67,7 @@ void main() {
   // convierte ese radio a pixeles a la distancia a la que esta. Sin ese factor
   // el tamano sale en unidades arbitrarias y las particulas acaban midiendo
   // menos de un pixel, que es como no dibujar nada.
-  gl_PointSize = uSize * (0.22 + aSpeed * 2.4) * (1.0 + vLife * 2.2) * uPixelRatio * uProjScale / max(-mv.z, 0.001);
+  gl_PointSize = uSize * (0.30 + aSpeed * 1.7) * (1.0 + vLife * 1.8) * uPixelRatio * uProjScale / max(-mv.z, 0.001);
 }
 `;
 
@@ -142,7 +142,7 @@ export function Particles() {
   const uniforms = useMemo(
     () => ({
       uBurst: { value: 0 },
-      uSize: { value: 0.016 },
+      uSize: { value: 0.0095 },
       uPixelRatio: { value: 1 },
       uProjScale: { value: 1000 },
       uTime: { value: 0 },

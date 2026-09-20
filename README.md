@@ -1,8 +1,12 @@
 # ECLIPSE
 
-Una experiencia de scroll cinematografico. Un eclipse volumetrico que reacciona
-al desplazamiento del usuario, se estira, se fractura y se convierte en una nube
-de particulas y humo azul que pasa a ser el fondo del resto de la pagina.
+Web de un estudio de diseno y desarrollo web.
+
+El eclipse no es el tema: es la demostracion. Un eclipse volumetrico que
+reacciona al scroll, se estira, se fractura y se convierte en humo azul que pasa
+a ser el fondo del contenido. Todo en tiempo real en el navegador, que es
+justamente el argumento de venta: lo que el visitante acaba de recorrer es una
+muestra de lo que se le puede construir.
 
 La propuesta creativa y tecnica completa, con el analisis de la referencia y el
 guion de tiempos, vive en el lienzo de diseno que acompana a este repositorio.
@@ -131,8 +135,17 @@ aunque el WebGL no arranque nunca: sin el se sirve un poster estatico.
 Con `prefers-reduced-motion` el eclipse cambia de estado por pasos discretos al
 entrar cada seccion, sin escrubado continuo ni explosion.
 
-## Lo que falta
+## Lo que falta antes de publicar
 
-Los corchetes del contenido marcan datos de negocio reales que no me
-corresponde inventar: nombres de proyecto, anos, correo de contacto y nombre del
-estudio.
+Los corchetes marcan datos reales que hay que rellenar, no relleno de plantilla:
+
+- `[PRECIO DESDE]` en los tres servicios.
+- `[NOMBRE DEL CLIENTE]`, `[AÑO]` y `[QUE SE HIZO, EN UNA LINEA]` en trabajos.
+- `[CORREO DE CONTACTO]` en `src/ui/Content.tsx` (la constante `EMAIL`), que es
+  a donde va el formulario.
+- `[NOMBRE DEL ESTUDIO]` y `[AÑO]` en el pie.
+
+El formulario de contacto abre el cliente de correo del visitante con el mensaje
+ya escrito. Funciona sin servidor desde el primer dia, pero cuando haya backend
+conviene cambiarlo por una peticion de verdad: el mailto depende de que el
+visitante tenga un cliente de correo configurado.

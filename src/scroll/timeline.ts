@@ -87,6 +87,8 @@ export interface EclipseState {
   diamond: number;
   /** Golpe de luz de la ignicion, 0 a 1. Sube de golpe y se apaga enseguida. */
   flash: number;
+  /** Enfriamiento de la materia, 0 a 1. Sube con la fractura y no baja. */
+  cool: number;
   /** Visibilidad de la fotosfera: se apaga al fracturarse. */
   photosphere: number;
   /** Opacidad del wordmark en la escena. */
@@ -132,6 +134,11 @@ export function evaluate(t: number): EclipseState {
 
   const cracks = easeInOut(fractura) * (1 - easeStep(ignicion));
 
+  // El enfriamiento NO puede ir atado a las grietas: estas se apagan con la
+  // ignicion, asi que en el momento del estallido el valor vale casi cero y el
+  // ambar sigue ahi, dando el pardo sucio. Esto sube con la fractura y se queda.
+  const cool = easeInOut(fractura);
+
   // La explosion y el humo comparten un unico avance continuo, para que las
   // particulas no den un salto al cruzar de un tramo al otro.
   const burst = clamp01(easeStep(ignicion) * 0.45 + easeSettle(humo) * 0.55);
@@ -164,6 +171,7 @@ export function evaluate(t: number): EclipseState {
     skyLight,
     stars,
     cracks,
+    cool,
     disc,
     burst,
     smoke,

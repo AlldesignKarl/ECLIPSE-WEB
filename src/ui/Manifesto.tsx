@@ -2,8 +2,11 @@ import { useMemo, useRef } from 'react';
 import { T, span } from '../scroll/timeline';
 import { useScrollBind } from './useScrollBind';
 
+// La frase de venta de toda la pagina, y llega en el mejor momento posible:
+// justo cuando el usuario acaba de quedarse mirando algo que no esperaba. No
+// describe el eclipse — lo convierte en argumento.
 const TEXT =
-  'No es oscuridad. Es la primera vez que la luz se aparta lo suficiente para que veamos de que esta hecha.';
+  'Esto no es un video. Es una pagina web funcionando en tu navegador ahora mismo. Asi trabajamos.';
 
 /**
  * El manifiesto.
