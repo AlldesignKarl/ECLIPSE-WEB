@@ -9,3 +9,4 @@ dist
 .diag.mjs
 .state.mjs
 .content.mjs
+.auth.mjs
