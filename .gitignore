@@ -10,3 +10,4 @@ dist
 .state.mjs
 .content.mjs
 .auth.mjs
+.og.mjs
