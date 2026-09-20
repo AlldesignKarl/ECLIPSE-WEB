@@ -129,7 +129,7 @@ a:hover {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   line-height: 1.7;
-  color: var(--ink-3);
+  color: #8b8b94;
 }
 
 .anchor--tl {
@@ -140,7 +140,7 @@ a:hover {
   pointer-events: auto;
 }
 .anchor--tl a {
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 .anchor--tl a:hover {
   color: var(--ink);
@@ -220,6 +220,31 @@ a:hover {
   will-change: opacity, transform, filter;
 }
 
+/* Un velo detras del texto. Las plumas de la corona son casi blancas, y el
+   parrafo las cruzaba por los lados: sobre ellas no se leia nada. El velo es
+   radial y sin borde, asi que oscurece justo donde hace falta sin que se vea
+   una caja — y sobre negro puro es invisible salvo ahi. */
+.mensaje::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150%;
+  height: 210%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.66) 38%,
+    rgba(0, 0, 0, 0.28) 66%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+}
+.mensaje > * {
+  position: relative;
+}
+
 .mensaje__n {
   display: block;
   font-family: var(--mono);
@@ -230,6 +255,7 @@ a:hover {
 }
 
 .mensaje__t {
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.9);
   margin: 0 0 18px;
   font-size: clamp(38px, 7vw, 76px);
   font-weight: 300;
@@ -240,12 +266,16 @@ a:hover {
 
 .mensaje__p {
   margin: 0 auto;
-  max-width: 440px;
-  font-size: clamp(14px, 1.6vw, 17px);
+  /* Mas estrecho que el disco a proposito: asi el parrafo cae siempre sobre la
+     zona oscura y no sobre las plumas. */
+  max-width: 340px;
+  font-size: clamp(14px, 1.5vw, 16px);
   font-weight: 300;
-  line-height: 1.6;
-  color: var(--ink-2);
-  text-shadow: 0 2px 26px rgba(0, 0, 0, 0.9);
+  line-height: 1.62;
+  color: #d4d4d8;
+  text-shadow:
+    0 2px 18px rgba(0, 0, 0, 0.95),
+    0 0 44px rgba(0, 0, 0, 0.85);
 }
 
 /* --- el indicador de scroll --------------------------------------------- */
