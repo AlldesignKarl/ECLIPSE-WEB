@@ -85,6 +85,8 @@ export interface EclipseState {
   smoke: number;
   /** Pico del anillo de diamante, 0 a 1. */
   diamond: number;
+  /** Golpe de luz de la ignicion, 0 a 1. Sube de golpe y se apaga enseguida. */
+  flash: number;
   /** Visibilidad de la fotosfera: se apaga al fracturarse. */
   photosphere: number;
   /** Opacidad del wordmark en la escena. */
@@ -135,6 +137,11 @@ export function evaluate(t: number): EclipseState {
   const burst = clamp01(easeStep(ignicion) * 0.45 + easeSettle(humo) * 0.55);
   const smoke = easeSettle(humo);
 
+  // El estallido se VE antes de entenderse: la luz llega primero y la materia
+  // despues. Sube de golpe con la ignicion y se apaga en el primer tercio del
+  // humo, para que no quede un resplandor flotando sobre la nube.
+  const flash = clamp01(easeStep(ignicion) * (1 - easeSettle(humo) * 1.8));
+
   // La fotosfera se apaga cuando el disco se cuartea, no antes.
   const photosphere = 1 - easeInOut(fractura) * 0.35 - easeStep(ignicion) * 0.65;
 
@@ -161,6 +168,7 @@ export function evaluate(t: number): EclipseState {
     burst,
     smoke,
     diamond,
+    flash,
     photosphere: clamp01(photosphere),
     wordmark,
   };

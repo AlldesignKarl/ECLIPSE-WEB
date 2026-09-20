@@ -22,6 +22,7 @@ const fragmentShader =
   /* glsl */ `
 uniform float uTime;
 uniform float uIntensity;
+uniform float uCool;
 varying vec3 vPos;
 varying vec3 vNormal;
 varying vec3 vView;
@@ -47,6 +48,11 @@ void main() {
   col = mix(col, hot, smoothstep(0.60, 0.92, g));
   col *= 0.30 + 0.90 * limb;
 
+  // Al cuartearse, la materia se enfria: el ambar vira a azul en lugar de
+  // apagarse sin mas. Si se queda ambar a intensidad baja, el disco toma un
+  // pardo sucio que ensucia justo el momento que deberia ser el mas limpio.
+  col = mix(col, vec3(0.30, 0.52, 0.82) * (0.25 + g * 0.9), uCool);
+
   gl_FragColor = vec4(col * uIntensity, 1.0);
 }
 `;
@@ -57,6 +63,7 @@ export function Photosphere() {
     () => ({
       uTime: { value: 0 },
       uIntensity: { value: 1 },
+      uCool: { value: 0 },
     }),
     [],
   );
@@ -70,6 +77,7 @@ export function Photosphere() {
     if (!u) return;
     u.uTime.value += delta;
     u.uIntensity.value = sceneState.photosphere;
+    u.uCool.value = sceneState.cracks;
     material.current!.visible = sceneState.photosphere > 0.002;
   });
 

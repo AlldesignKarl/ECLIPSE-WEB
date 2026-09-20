@@ -67,7 +67,7 @@ void main() {
   // convierte ese radio a pixeles a la distancia a la que esta. Sin ese factor
   // el tamano sale en unidades arbitrarias y las particulas acaban midiendo
   // menos de un pixel, que es como no dibujar nada.
-  gl_PointSize = uSize * (0.35 + aSpeed) * (1.0 + vLife * 2.6) * uPixelRatio * uProjScale / max(-mv.z, 0.001);
+  gl_PointSize = uSize * (0.22 + aSpeed * 2.4) * (1.0 + vLife * 2.2) * uPixelRatio * uProjScale / max(-mv.z, 0.001);
 }
 `;
 
@@ -92,7 +92,9 @@ void main() {
   col = mix(col, vec3(0.15, 0.29, 0.45), smoothstep(0.44, 1.0, vLife));
 
   float fade = 1.0 - smoothstep(0.58, 1.0, vLife);
-  gl_FragColor = vec4(col, soft * fade * uBurst * (0.30 + vSpeed * 0.8));
+  // Al nacer son energia y queman; al morir son materia y solo tapan.
+  float birth = 1.0 - smoothstep(0.0, 0.22, vLife);
+  gl_FragColor = vec4(col * (1.0 + birth * 2.2), soft * fade * uBurst * (0.45 + vSpeed * 0.9));
 }
 `;
 
@@ -122,9 +124,10 @@ export function Particles() {
       seed[i * 3 + 1] = Math.random();
       seed[i * 3 + 2] = Math.random();
 
-      // Distribucion sesgada: muchas lentas y pocas muy rapidas, que son las
-      // que dibujan los filamentos largos del frente.
-      speed[i] = Math.pow(Math.random(), 1.8);
+      // Distribucion muy sesgada: muchisimas lentas y pequenas, unas pocas
+      // rapidas y grandes. Con un reparto uniforme la nube se lee como nieve;
+      // lo que la hace explosion es que unas cuantas se adelanten al frente.
+      speed[i] = Math.pow(Math.random(), 2.6);
     }
 
     const geo = new THREE.BufferGeometry();

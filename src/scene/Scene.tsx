@@ -9,6 +9,7 @@ import { Sky } from './Sky';
 import { Wordmark } from './Wordmark';
 import { Particles } from './Particles';
 import { Smoke } from './Smoke';
+import { Flash } from './Flash';
 import { AdaptiveResolution, Rig } from './Rig';
 import { Effects } from './Effects';
 
@@ -81,6 +82,7 @@ export function Scene({ onReady, active }: { onReady: () => void; active: boolea
       <Moon />
       <Particles />
       <Smoke />
+      <Flash />
       <Effects />
       <Precompile onReady={onReady} />
     </Canvas>
