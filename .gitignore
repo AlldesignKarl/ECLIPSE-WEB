@@ -8,3 +8,4 @@ dist
 .freeze.mjs
 .diag.mjs
 .state.mjs
+.content.mjs
