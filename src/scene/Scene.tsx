@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { detectProfile } from './profile';
-import { Photosphere, Chromosphere } from './Sun';
-import { Moon } from './Moon';
-import { Corona } from './Corona';
+import { Eclipse } from './Eclipse';
 import { Sky } from './Sky';
 import { Wordmark } from './Wordmark';
 import { Particles } from './Particles';
@@ -69,17 +67,14 @@ export function Scene({ onReady, active }: { onReady: () => void; active: boolea
       onCreated={({ gl, scene }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.04;
-        scene.background = new THREE.Color('#06070A');
+        scene.background = new THREE.Color('#000000');
       }}
     >
       <Rig />
       <AdaptiveResolution max={profile.maxDpr} />
       <Sky />
       <Wordmark />
-      <Corona />
-      <Photosphere />
-      <Chromosphere />
-      <Moon />
+      <Eclipse />
       <Particles />
       <Smoke />
       <Flash />

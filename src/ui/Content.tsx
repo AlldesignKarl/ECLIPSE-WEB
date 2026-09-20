@@ -106,12 +106,29 @@ export function Content() {
         <h2>
           <strong>Lo último</strong> <em>que hemos hecho</em>
         </h2>
+
+        <article className="trabajo">
+          <img
+            className="trabajo__img"
+            src="/proyectos/alldesign-karl.jpg"
+            width={1280}
+            height={857}
+            loading="lazy"
+            decoding="async"
+            alt="Página de inicio de Alldesign Karl: fragmentos de porcelana con filo dorado flotando sobre un fondo oscuro"
+          />
+          <div className="trabajo__txt">
+            <span className="trabajo__meta">[AÑO] · Porcelana artesanal</span>
+            <h3>Alldesign Karl</h3>
+            <p>
+              Tienda y catálogo para una casa de porcelana hecha a mano. Los fragmentos flotan en 3D
+              sobre la portada y se recomponen al desplazarse, porque la marca vende precisamente
+              eso: que cada pieza tiene una historia.
+            </p>
+          </div>
+        </article>
+
         <ul className="archive">
-          <li>
-            <span className="archive__year">[AÑO]</span>
-            <h3>[NOMBRE DEL CLIENTE]</h3>
-            <p>[QUÉ SE HIZO, EN UNA LÍNEA]</p>
-          </li>
           <li>
             <span className="archive__year">[AÑO]</span>
             <h3>[NOMBRE DEL CLIENTE]</h3>

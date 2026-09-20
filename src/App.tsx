@@ -5,7 +5,7 @@ import { STAGE_VH } from './scroll/timeline';
 import { attachStage, subscribe } from './scroll/scrollStore';
 import { updateSceneState } from './scene/state';
 import { Anchors } from './ui/Anchors';
-import { Manifesto } from './ui/Manifesto';
+import { Mensajes, MensajesAccesibles } from './ui/Mensajes';
 import { ScrollHint } from './ui/ScrollHint';
 import { Preloader } from './ui/Preloader';
 import { Content } from './ui/Content';
@@ -108,7 +108,8 @@ export function App() {
       <a className="skip" href="#servicios">
         Saltar al contenido
       </a>
-      <h1 className="sr-only">ECLIPSE</h1>
+      <h1 className="sr-only">ECLIPSE — Diseño y desarrollo web</h1>
+      <MensajesAccesibles />
 
       {webgl ? (
         <>
@@ -116,7 +117,7 @@ export function App() {
           <div className="stage" ref={stage} style={{ height: `${reduced ? 400 : STAGE_VH}vh` }}>
             <div className="stage__sticky">
               <Anchors />
-              <Manifesto />
+              <Mensajes />
               <ScrollHint />
             </div>
           </div>

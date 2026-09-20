@@ -26,26 +26,20 @@ const backdropFragment =
 uniform float uLight;
 varying vec3 vPos;
 
-// OJO: estos valores son LINEALES, no sRGB. El renderer convierte al escribir,
-// asi que un 0.0075 aqui sale como un gris azulado bien visible en pantalla, no
-// como negro. El negro del sistema, #06070A, es aproximadamente 0.0018 lineal.
-const vec3 NIGHT = vec3(0.0016, 0.0019, 0.0029);
-const vec3 DAY_EDGE = vec3(0.0032, 0.0075, 0.0180);
-const vec3 DAY_CORE = vec3(0.0110, 0.0240, 0.0680);
+// Negro. Sin fase de dia no hay nada que mezclar, y el negro es el sistema.
+//
+// No es cero absoluto: un negro plano hace bandas en cuanto algo lo ilumina, y
+// ademas mata el bloom. Es un valor minimo mas dithering, que en pantalla se
+// lee como negro pero se comporta mucho mejor.
+const vec3 NIGHT = vec3(0.0008, 0.0009, 0.0013);
 
 void main() {
   vec3 d = normalize(vPos);
-
-  // Halo atmosferico alrededor del sol: intenso con luz de dia, inexistente en
-  // totalidad. Pierde saturacion antes de perder brillo, como el cielo real.
-  float toCenter = 1.0 - clamp(length(d.xy) * 1.35, 0.0, 1.0);
-  vec3 day = mix(DAY_EDGE, DAY_CORE, pow(toCenter, 2.0));
-
-  vec3 col = mix(NIGHT, day, uLight);
+  vec3 col = NIGHT * uLight;
 
   // Polvo muy tenue, para que el vacio tenga grano propio y no sea una pared.
   float dust = fbm(d * 2.6, 3) * 0.5 + 0.5;
-  col += vec3(0.0013, 0.0018, 0.0030) * pow(dust, 3.0) * (1.0 - uLight * 0.5);
+  col += vec3(0.0009, 0.0011, 0.0017) * pow(dust, 3.0);
 
   gl_FragColor = vec4(col + dither(gl_FragCoord.xy), 1.0);
 }
@@ -56,7 +50,7 @@ function Backdrop() {
   const uniforms = useMemo(() => ({ uLight: { value: 1 } }), []);
   useFrame(() => {
     const u = material.current?.uniforms;
-    if (u) u.uLight.value = sceneState.skyLight;
+    if (u) u.uLight.value = 1;
   });
   return (
     <mesh renderOrder={-10}>

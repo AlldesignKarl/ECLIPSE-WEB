@@ -24,9 +24,9 @@ function draw(canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
-  ctx.fillStyle = '#eef4fb';
+  ctx.fillStyle = '#f4f4f5';
   ctx.textBaseline = 'middle';
-  ctx.font = '200 196px "IBM Plex Sans", system-ui, sans-serif';
+  ctx.font = '300 196px "Space Grotesk", system-ui, sans-serif';
 
   const gap = TRACKING * 196;
   const letters = [...TEXT];

@@ -99,16 +99,13 @@ export function Moon() {
       material.current.depthWrite = sceneState.disc > 0.985;
       material.current.visible = sceneState.disc > 0.004;
     }
-    if (group.current) {
-      group.current.position.x = sceneState.moonX;
-      // Una inclinacion minima en Y: la trayectoria real de un eclipse no es
-      // horizontal perfecta, y esa asimetria es la que lo hace creible.
-      group.current.position.y = sceneState.moonX * 0.11;
-    }
+    // Un giro propio muy lento sobre el del grupo: el relieve se mueve y el
+    // disco deja de parecer un agujero recortado.
+    if (group.current) group.current.rotation.y += delta * 0.04;
   });
 
   return (
-    <group ref={group} position={[3.4, 0.37, 0.28]}>
+    <group ref={group} position={[0, 0, 0.28]}>
       <mesh>
         <sphereGeometry args={[1.018, 96, 96]} />
         <shaderMaterial
