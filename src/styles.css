@@ -229,14 +229,20 @@ a:hover {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 150%;
-  height: 210%;
+  width: 190%;
+  height: 300%;
   transform: translate(-50%, -50%);
+  /* `closest-side` es imprescindible. Con el tamano por defecto el degradado
+     llega a transparente en las ESQUINAS de su caja, de modo que en los lados
+     todavia queda opacidad y se corta en seco: se dibujaba un rectangulo
+     perfectamente visible sobre la corona. Con closest-side llega a cero en los
+     lados y no hay canto en ninguna parte. */
   background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0.82) 0%,
-    rgba(0, 0, 0, 0.66) 38%,
-    rgba(0, 0, 0, 0.28) 66%,
+    ellipse closest-side at center,
+    rgba(0, 0, 0, 0.84) 0%,
+    rgba(0, 0, 0, 0.72) 30%,
+    rgba(0, 0, 0, 0.44) 56%,
+    rgba(0, 0, 0, 0.16) 78%,
     rgba(0, 0, 0, 0) 100%
   );
   pointer-events: none;
