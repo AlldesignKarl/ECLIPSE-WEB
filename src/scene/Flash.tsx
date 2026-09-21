@@ -49,7 +49,7 @@ void main() {
   halo *= 0.55 + 0.75 * smoothstep(-0.15, 0.25, rays);
 
   float i = (core * 1.5 + halo * 0.34) * uFlash;
-  vec3 col = mix(vec3(0.62, 0.80, 1.0), vec3(1.0), clamp(core * 1.6, 0.0, 1.0));
+  vec3 col = mix(vec3(0.48, 0.74, 1.0), vec3(0.94, 0.98, 1.0), clamp(core * 1.6, 0.0, 1.0));
 
   gl_FragColor = vec4(col * i + dither(gl_FragCoord.xy), 1.0);
 }

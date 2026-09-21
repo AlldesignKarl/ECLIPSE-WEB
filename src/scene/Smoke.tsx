@@ -64,15 +64,18 @@ void main() {
   float body = 1.0 - smoothstep(0.05, 1.0, r);
   // smoothstep en vez de clamp: recorta los medios tonos y deja jirones en
   // lugar de una sabana uniforme.
-  float density = smoothstep(0.06, 0.40, 0.28 + n);
+  float density = smoothstep(0.04, 0.42, 0.32 + n);
   float a = body * density * uDensity;
 
   // Azul claro donde el humo es denso, azul de sombra donde se deshilacha: el
   // volumen sale de esa diferencia, no de una textura.
   // Valores LINEALES: 0.22 aqui se ve como un 0.50 en pantalla.
-  vec3 col = mix(vec3(0.008, 0.016, 0.032), vec3(0.11, 0.24, 0.42), clamp(n * 1.3 + 0.5, 0.0, 1.0));
+  // Azul claro de verdad. Antes quedaba tan apagado que se perdia contra el
+  // negro; el encargo era una nube de humo azul claro y tiene que leerse como
+  // tal, no como una sombra azulada.
+  vec3 col = mix(vec3(0.020, 0.045, 0.085), vec3(0.34, 0.60, 0.88), clamp(n * 1.3 + 0.5, 0.0, 1.0));
 
-  gl_FragColor = vec4(col, a * 0.30);
+  gl_FragColor = vec4(col, a * 0.42);
 }
 `;
 

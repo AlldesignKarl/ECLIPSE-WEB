@@ -87,9 +87,11 @@ void main() {
   // Gradiente de vida: blanco, ambar, azul claro, azul profundo. El viraje a
   // azul ocurre pronto y en poco recorrido, para que se lea como cambio de
   // estado y no como un degradado decorativo. La materia se enfria.
-  vec3 col = mix(vec3(1.0), vec3(1.0, 0.86, 0.68), smoothstep(0.0, 0.14, vLife));
-  col = mix(col, vec3(0.56, 0.78, 0.95), smoothstep(0.14, 0.32, vLife));
-  col = mix(col, vec3(0.15, 0.29, 0.45), smoothstep(0.44, 1.0, vLife));
+  // Blanco al nacer, azul claro enseguida. El viraje ocurre pronto y en poco
+  // recorrido para que se lea como cambio de estado y no como un degradado.
+  vec3 col = mix(vec3(1.0), vec3(0.78, 0.90, 1.0), smoothstep(0.0, 0.12, vLife));
+  col = mix(col, vec3(0.44, 0.72, 0.98), smoothstep(0.12, 0.30, vLife));
+  col = mix(col, vec3(0.16, 0.34, 0.58), smoothstep(0.46, 1.0, vLife));
 
   float fade = 1.0 - smoothstep(0.58, 1.0, vLife);
   // Al nacer son energia y queman; al morir son materia y solo tapan.
