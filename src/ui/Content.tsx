@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useReveal } from './useReveal';
 
 /**
  * El contenido.
@@ -14,8 +15,11 @@ import { useState } from 'react';
  * clientes, datos de contacto. Son datos reales, no relleno.
  */
 export function Content() {
+  const raiz = useRef<HTMLElement>(null);
+  useReveal(raiz);
+
   return (
-    <main className="content">
+    <main className="content" ref={raiz}>
       <section className="section section--first" id="servicios">
         <p className="kicker">01 — Servicios</p>
         <h2>
@@ -25,7 +29,7 @@ export function Content() {
           <p>
             La mayoría de las páginas se olvidan antes de cerrarse. Se parecen entre sí porque salen
             de las mismas plantillas, y compiten por atención con las mismas herramientas que todos
-            los demas.
+            los demás.
           </p>
           <p>
             Nosotros hacemos la otra clase. El eclipse que acabas de recorrer no es un video ni una
@@ -36,7 +40,7 @@ export function Content() {
 
         <ul className="offer">
           <li>
-            <h3>Landing de una pagina</h3>
+            <h3>Landing de una página</h3>
             <p>
               Una sola pieza, pensada para que quien entre no pueda irse sin recordarla. Ideal para
               lanzamientos, portfolios y productos únicos.

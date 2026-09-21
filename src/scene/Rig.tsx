@@ -1,6 +1,13 @@
 import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import type * as THREE from 'three';
 import { sceneState } from './state';
+
+/** Medio ancho de mundo que tiene que caber en pantalla, pase lo que pase. */
+const ENCUADRE = 1.95;
+
+/** Distancia nominal de la camara en horizontal, con la que se calibro todo. */
+const BASE_Z = 6.6;
 
 /**
  * La camara.
@@ -13,22 +20,40 @@ import { sceneState } from './state';
  * En la ignicion retrocede de golpe, como si la onda empujara al espectador.
  */
 export function Rig() {
-  const camera = useThree((s) => s.camera);
+  const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
   const size = useThree((s) => s.size);
   const current = useRef(7.4);
 
-  // En vertical no encogemos la escena: cambiamos el encuadre. La camara mira
-  // por debajo del disco, que sube al tercio superior y deja sitio al texto.
-  const portrait = size.height > size.width * 1.05;
-
   useFrame((_, delta) => {
-    const target = sceneState.cameraZ * (portrait ? 1.24 : 1);
+    // El encuadre se calcula, no se elige con un interruptor.
+    //
+    // En Three el campo de vision es VERTICAL. En una pantalla alta y estrecha
+    // la altura visible es la misma pero el ancho se encoge con la proporcion,
+    // asi que el disco se sale por los lados aunque en horizontal quepa de
+    // sobra. Ahi estaba el recorte del movil: con un multiplicador fijo de 1.24
+    // el medio ancho visible quedaba en 1.45 unidades y el disco solo ya mide
+    // 1.11. No cabia, y el wordmark, de 8.6 de ancho, menos todavia.
+    //
+    // Asi que la camara se retira lo justo para que quepan ENCUADRE unidades de
+    // ancho, sea cual sea la proporcion. Una sola formula cubre el movil en
+    // vertical, la tableta, el portatil y el monitor panoramico, y lo hace de
+    // forma continua: no hay un salto al cruzar un punto de ruptura.
+    const aspecto = size.width / Math.max(size.height, 1);
+    const medioFov = (camera.fov * Math.PI) / 360;
+    const zEncuadre = ENCUADRE / (Math.tan(medioFov) * Math.max(aspecto, 0.01));
+
+    // Nunca acerca, solo retira: en horizontal el resultado es exactamente el
+    // de antes. Y multiplica en vez de sustituir, para que el avance y el
+    // retroceso de la camara del guion se conserven enteros en vertical.
+    const encuadre = Math.max(1, zEncuadre / BASE_Z);
+    const target = sceneState.cameraZ * encuadre;
+
     // Un segundo amortiguamiento, mas suave que el del scroll: la camara llega
     // siempre un poco tarde y eso es lo que se percibe como peso.
     const k = 1 - Math.pow(1 - 0.12, delta * 60);
     current.current += (target - current.current) * k;
     camera.position.set(0, 0, current.current);
-    camera.lookAt(0, portrait ? -0.62 : 0, 0);
+    camera.lookAt(0, 0, 0);
   });
 
   return null;

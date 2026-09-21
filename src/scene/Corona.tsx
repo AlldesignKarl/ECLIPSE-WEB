@@ -115,6 +115,39 @@ void main() {
   float inner = smoothstep(DISC * 0.96, DISC * 1.10, r);
   float d = dens * outer * inner;
 
+  // Protuberancias: arcos de gas encendido pegados al limbo.
+  //
+  // En un eclipse de verdad son lo primero que se busca, y aqui ademas
+  // resuelven un problema de ritmo: el tramo de lectura dura medio minuto y
+  // hasta ahora lo unico que cambiaba en pantalla era el giro. Estas laten.
+  //
+  // Solo salen en unos pocos angulos, los que el ruido deja por encima del
+  // corte, para que se lean como accidentes del borde y no como una guirnalda
+  // repartida a intervalos iguales.
+  float ruidoProt = fbm(vec3(cos(a), sin(a), 0.0) * 3.4 + vec3(0.0, 0.0, uTime * 0.035), 3);
+  // El corte, medido pintando el factor en un canal de color y mirandolo: con
+  // 0.02 sobrevivia la mitad de la vuelta y el resultado era un halo continuo
+  // pegado al disco, no arcos. Una protuberancia se reconoce por ser un
+  // accidente aislado; si da la vuelta entera, es un ribete.
+  float arco = smoothstep(0.05, 0.11, ruidoProt);
+  // Campana estrecha justo por fuera del disco: una protuberancia que se
+  // despega del limbo deja de parecer gas atrapado y parece una luz pegada.
+  //
+  // La campana va CENTRADA FUERA del limbo con margen de sobra. A un 5 % del
+  // radio quedaba a unos ocho pixeles del borde con la mitad de la campana por
+  // dentro, asi que la luna se comia casi toda y lo que sobrevivia era un ribete
+  // azul sin forma. DISC es el radio aparente del disco: todo lo que este por
+  // debajo de DISC no se ve, y lo que este justo encima casi tampoco.
+  //
+  // Estrecha en radio y ancha en angulo: una protuberancia ABRAZA el limbo. Con
+  // la campana ancha salian cunas que apuntaban hacia fuera, que es la forma de
+  // un rayo, no la de un arco de gas.
+  float grosor = DISC * 0.065;
+  float banda = exp(-pow((r - DISC * 1.105) / grosor, 2.0));
+  // Latido lento y desfasado con el angulo, para que no palpiten todas a la vez.
+  float latido = 0.66 + 0.34 * sin(uTime * 0.8 + a * 2.7);
+  float prot = arco * banda * latido * inner;
+
   // Las zonas densas tiran a blanco, las finas al azul del sistema.
   // Blanco perlado, no blanco puro. La corona real tira a marfil con un punto
   // frio, y ese matiz es buena parte de lo que la hace parecer materia.
@@ -132,7 +165,23 @@ void main() {
   //
   // Ganancia calibrada sobre el valor medido de d: unos 0.10 en el pico junto
   // al disco y 0.006 en el borde exterior.
-  gl_FragColor = vec4(col * d * uIntensity * 0.52 + dither(gl_FragCoord.xy), 1.0);
+  // Las protuberancias van SUMADAS aparte, no multiplicadas por la densidad de
+  // la corona: son su propia fuente de luz, y colandolas dentro de la densidad se
+  // apagarian justo en los angulos donde no hay pluma, que es donde mas se ven.
+  // Rosa, no blanco, y es la decision correcta por dos motivos a la vez.
+  //
+  // El fisico: las protuberancias emiten en H-alfa, y en una foto de un eclipse
+  // total son los unicos puntos calidos de toda la imagen. El practico: junto al
+  // limbo la corona ya esta casi saturada de blanco, asi que sumar mas blanco
+  // ahi no se ve. Lo que separa una luz de otra cuando las dos son brillantes no
+  // es el brillo, es el tono.
+  //
+  // Es el unico color calido de la pieza y entra en una franja de pocos pixeles:
+  // acento, no cambio de paleta.
+  vec3 colProt = mix(vec3(1.0, 0.42, 0.46), vec3(1.0, 0.78, 0.74), smoothstep(0.4, 1.0, arco));
+  vec3 luzProt = colProt * prot * uIntensity * 0.26;
+
+  gl_FragColor = vec4(col * d * uIntensity * 0.52 + luzProt + dither(gl_FragCoord.xy), 1.0);
 }
 `;
 

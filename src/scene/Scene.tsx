@@ -6,6 +6,7 @@ import { Eclipse } from './Eclipse';
 import { Sky } from './Sky';
 import { Wordmark } from './Wordmark';
 import { Particles } from './Particles';
+import { Motas } from './Motas';
 import { Flash } from './Flash';
 import { Humo } from './Humo';
 import { AdaptiveResolution, Rig } from './Rig';
@@ -73,6 +74,7 @@ export function Scene({ onReady, active }: { onReady: () => void; active: boolea
       <Rig />
       <AdaptiveResolution max={profile.maxDpr} />
       <Sky />
+      <Motas />
       <Wordmark />
       <Eclipse />
       <Particles />
