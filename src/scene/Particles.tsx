@@ -96,7 +96,7 @@ void main() {
   float fade = 1.0 - smoothstep(0.58, 1.0, vLife);
   // Al nacer son energia y queman; al morir son materia y solo tapan.
   float birth = 1.0 - smoothstep(0.0, 0.22, vLife);
-  gl_FragColor = vec4(col * (1.0 + birth * 0.9), soft * fade * uBurst * (0.40 + vSpeed * 0.8));
+  gl_FragColor = vec4(col * (1.0 + birth * 1.3), soft * fade * uBurst * (0.62 + vSpeed * 0.9));
 }
 `;
 
@@ -144,7 +144,7 @@ export function Particles() {
   const uniforms = useMemo(
     () => ({
       uBurst: { value: 0 },
-      uSize: { value: 0.0095 },
+      uSize: { value: 0.021 },
       uPixelRatio: { value: 1 },
       uProjScale: { value: 1000 },
       uTime: { value: 0 },

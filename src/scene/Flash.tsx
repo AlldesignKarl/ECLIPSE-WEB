@@ -48,7 +48,7 @@ void main() {
   float rays = fbm(vec3(cos(a), sin(a), 0.0) * 4.0 + vec3(0.0, 0.0, uTime * 0.05), 3);
   halo *= 0.55 + 0.75 * smoothstep(-0.15, 0.25, rays);
 
-  float i = (core * 1.5 + halo * 0.34) * uFlash;
+  float i = (core * 0.85 + halo * 0.14) * uFlash;
   vec3 col = mix(vec3(0.48, 0.74, 1.0), vec3(0.94, 0.98, 1.0), clamp(core * 1.6, 0.0, 1.0));
 
   gl_FragColor = vec4(col * i + dither(gl_FragCoord.xy), 1.0);
@@ -70,14 +70,14 @@ export function Flash() {
       mesh.current.visible = sceneState.flash > 0.003;
       // Crece con el propio golpe: al nacer es un punto, al apagarse ya ha
       // barrido el encuadre.
-      const s = 1 + sceneState.burst * 1.9;
+      const s = 1 + sceneState.burst * 0.8;
       mesh.current.scale.setScalar(s);
     }
   });
 
   return (
     <mesh ref={mesh} position={[0, 0, 0.35]} renderOrder={1}>
-      <planeGeometry args={[6, 6]} />
+      <planeGeometry args={[3.2, 3.2]} />
       <shaderMaterial
         ref={material}
         uniforms={uniforms}
