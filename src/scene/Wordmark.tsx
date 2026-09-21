@@ -107,10 +107,10 @@ export function Wordmark() {
     const medioAncho = Math.tan(medioFov) * distancia * aspecto;
 
     // Se compara texto contra ancho visible, no plano contra ancho visible. El
-    // 97 % deja un respiro: la palabra tiene que tocar casi el borde, porque esa
-    // tension es parte del diseno. Lo que no puede es salirse ni encogerse tanto
-    // que el disco se la coma.
-    const escala = Math.min(1, (medioAncho * 0.97) / medioTexto.current);
+    // 92 % deja un respiro: la palabra tiene que acercarse al borde, porque esa
+    // tension es parte del diseno, pero en vertical al 97 % las dos "E" de los
+    // extremos quedaban mordidas por el canto de la pantalla.
+    const escala = Math.min(1, (medioAncho * 0.92) / medioTexto.current);
     mesh.current.scale.setScalar(escala);
   });
 

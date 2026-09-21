@@ -207,6 +207,12 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* El velo de cada mensaje mide el 190 % de su caja para poder desvanecerse
+     sin canto, y en vertical eso lo sacaba hasta los 559 pixeles en una
+     pantalla de 412. Un pseudoelemento no aparece al recorrer el DOM, asi que
+     desbordaba el documento sin figurar en ningun sitio. Aqui se recorta, y
+     como el degradado ya llega a transparente en los lados, el corte no se ve. */
+  overflow: hidden;
 }
 
 /* Los tres comparten sitio: van apilados en la misma celda, asi que nunca hay
@@ -869,11 +875,34 @@ a:hover {
 
 /* Grano y vineta cubren tambien las secciones de contenido, no solo el lienzo:
    si se cortaran al salir de la escena, el cambio se notaria al instante. */
+/* El grano va en DOS capas, y no es un capricho de estructura.
+ *
+ * La capa que se mueve tiene que ser mas grande que la pantalla, o al
+ * desplazarse deja ver sus bordes. Pero estaba puesta directamente sobre el
+ * elemento fijo, con inset -50 %: 824 pixeles de ancho en una pantalla de 412,
+ * de -203 a 621.
+ *
+ * Y el overflow-x: hidden del body NO la recortaba, porque el bloque contenedor
+ * de un elemento fijo es el viewport, no el body. Asi que el documento
+ * desbordaba 147 pixeles en horizontal, y en un movil de verdad eso ensancha el
+ * viewport de maquetacion: el lienzo pasaba a medir 559 mientras las secciones
+ * seguian midiendo 412, y por la diferencia asomaba una banda de humo azul a la
+ * derecha de toda la pagina.
+ *
+ * Ahora el elemento fijo mide exactamente el viewport y recorta; lo que se sale
+ * es el pseudoelemento de dentro, que ya no cuenta para el ancho del documento.
+ */
 .grain {
   position: fixed;
-  inset: -50%;
+  inset: 0;
   z-index: 90;
   pointer-events: none;
+  overflow: hidden;
+}
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
   opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
   animation: grainShift 0.7s steps(3) infinite;
@@ -936,7 +965,7 @@ a:hover {
   html {
     scroll-behavior: auto;
   }
-  .grain {
+  .grain::before {
     animation: none;
   }
   .poster__corona {

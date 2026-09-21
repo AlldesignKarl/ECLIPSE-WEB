@@ -74,9 +74,20 @@ export function useReveal(root: React.RefObject<HTMLElement | null>) {
 
     const revisa = () => {
       const limite = window.innerHeight * UMBRAL;
+
+      // Al final del documento ya no se puede bajar mas, asi que lo que quede
+      // por debajo del umbral no va a cruzarlo NUNCA. Le pasaba al pie, que es
+      // el ultimo elemento: su borde superior no llegaba a subir del 90 % de la
+      // ventana, se quedaba a opacidad cero para siempre y por el hueco se veia
+      // la escena 3D asomando al fondo de la pagina. Aqui vale con estar en
+      // pantalla.
+      const alFinal =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+
       pendientes = pendientes.filter((pieza) => {
         const r = pieza.getBoundingClientRect();
-        if (r.top >= limite || r.bottom <= 0) return true;
+        const dentro = r.bottom > 0 && (r.top < limite || (alFinal && r.top < window.innerHeight));
+        if (!dentro) return true;
         pieza.classList.add('revela--visto');
         return false;
       });
