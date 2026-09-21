@@ -6,8 +6,8 @@ import { Eclipse } from './Eclipse';
 import { Sky } from './Sky';
 import { Wordmark } from './Wordmark';
 import { Particles } from './Particles';
-import { Smoke } from './Smoke';
 import { Flash } from './Flash';
+import { Humo } from './Humo';
 import { AdaptiveResolution, Rig } from './Rig';
 import { Effects } from './Effects';
 
@@ -76,8 +76,8 @@ export function Scene({ onReady, active }: { onReady: () => void; active: boolea
       <Wordmark />
       <Eclipse />
       <Particles />
-      <Smoke />
       <Flash />
+      <Humo />
       <Effects />
       <Precompile onReady={onReady} />
     </Canvas>

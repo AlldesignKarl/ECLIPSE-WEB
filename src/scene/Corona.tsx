@@ -78,12 +78,21 @@ void main() {
     // cualquier umbral que pongas encima satura en casi todo el campo. Y el
     // sesgo depende del hash, asi que calibrarlo a ojo no aguanta un cambio de
     // frecuencia.
-    float coarse = fbm(ray * 2.4 + vec3(0.0, 0.0, uTime * 0.012), 3) - fbm(ray * 0.7, 2);
-    float fine = fbm(ray * (5.6 + rr * 6.0) + vec3(0.0, 0.0, uTime * 0.02), 4) - fbm(ray * 1.4, 2);
+    // Las frecuencias mandan sobre el numero de plumas: el vector angular es
+    // unitario, asi que el factor ES cuantas celdas de ruido caben en la vuelta. A
+    // 2.4 salian unas quince plumas, y quince plumas regulares y duras no son
+    // una corona: son un filtro de estrella. Una corona real tiene decenas de
+    // filamentos finos.
+    float coarse = fbm(ray * 5.5 + vec3(0.0, 0.0, uTime * 0.012), 3) - fbm(ray * 1.6, 2);
+    float fine = fbm(ray * (13.0 + rr * 14.0) + vec3(0.0, 0.0, uTime * 0.02), 4) - fbm(ray * 3.2, 2);
 
     // smoothstep en lugar de pow: acota el resultado a [0,1] pase lo que pase
     // con el ruido. Con pow, un pico dispara el valor y todo satura.
-    float plume = smoothstep(0.0, 0.26, fine) * (0.22 + 1.05 * smoothstep(-0.04, 0.20, coarse));
+    //
+    // Y los cortes van ANCHOS. Estrechos convierten el ruido en una mascara casi
+    // binaria, y una mascara binaria da cunas de borde duro. El borde blando es
+    // la mitad de lo que hace que parezca gas.
+    float plume = smoothstep(-0.10, 0.34, fine) * (0.40 + 0.75 * smoothstep(-0.16, 0.28, coarse));
 
     // Caida exponencial en lugar de una potencia de 1/r: misma lectura, sin la
     // singularidad que revienta el borde del disco.
@@ -91,7 +100,12 @@ void main() {
     // alejarse del limbo: intensa pegada al disco y muy debil a partir de dos
     // radios. Con una caida suave las plumas llegan igual de fuertes al borde
     // del encuadre, y el resultado es un foco, no un eclipse.
-    dens += plume * exp(-(rr - DISC) * 11.0);
+    // Y cada pluma tiene su PROPIO alcance. Con una caida igual para todas, la
+    // corona termina en una circunferencia limpia a la misma distancia en todas
+    // direcciones, que es el otro delator. Las densas llegan lejos, las flojas
+    // se quedan pegadas al limbo, y ese perfil irregular es la silueta.
+    float alcance = 16.0 - 8.5 * smoothstep(-0.16, 0.30, coarse);
+    dens += plume * exp(-(rr - DISC) * alcance);
   }
   dens /= float(STEPS);
 
@@ -118,7 +132,7 @@ void main() {
   //
   // Ganancia calibrada sobre el valor medido de d: unos 0.10 en el pico junto
   // al disco y 0.006 en el borde exterior.
-  gl_FragColor = vec4(col * d * uIntensity * 0.62 + dither(gl_FragCoord.xy), 1.0);
+  gl_FragColor = vec4(col * d * uIntensity * 0.52 + dither(gl_FragCoord.xy), 1.0);
 }
 `;
 

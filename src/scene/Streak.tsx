@@ -47,12 +47,17 @@ void main() {
   // Se apaga hacia las puntas, y arranca justo fuera del disco.
   // Arranca pegado al borde del disco: si empieza lejos se lee como dos rayas
   // sueltas en vez de como una linea que lo atraviesa.
-  float along = (1.0 - smoothstep(0.14, 0.92, d)) * smoothstep(0.045, 0.10, d);
+  //
+  // El plano mide veintiseis unidades y el encuadre solo muerde unas ocho, asi
+  // que d llega al borde de pantalla valiendo apenas 0.32: apagandose desde
+  // 0.92 la linea seguia al 87 % al salirse del cuadro, o sea que no se
+  // apagaba, cruzaba entera de lado a lado. Se apaga dentro del encuadre.
+  float along = (1.0 - smoothstep(0.10, 0.34, d)) * smoothstep(0.045, 0.09, d);
 
   // Ruido a lo largo: la luz no es un tubo perfecto.
   float grain = 0.72 + 0.42 * smoothstep(-0.2, 0.3, fbm(vec3(x * 5.0, 0.0, uTime * 0.05), 3));
 
-  float i = (core * 1.05 + glow * 0.22) * along * grain * uIntensity;
+  float i = (core * 0.70 + glow * 0.20) * along * grain * uIntensity;
   vec3 col = mix(vec3(0.62, 0.70, 0.86), vec3(0.95, 0.96, 1.0), clamp(core, 0.0, 1.0));
 
   gl_FragColor = vec4(col * i + dither(gl_FragCoord.xy), 1.0);

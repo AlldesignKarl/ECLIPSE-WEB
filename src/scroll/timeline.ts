@@ -113,12 +113,20 @@ export function evaluate(t: number): EclipseState {
   const cameraZ = mix(6.6, 5.4, dolly) + kick * 0.9 + pull * 2.9;
 
   // La corona esta desde el primer fotograma: el eclipse ya esta formado.
-  const coronaFade = 1 - easeStep(ignicion) * 0.85 - easeSettle(humo) * 0.15;
-  const corona = clamp01(Math.max(0, coronaFade));
+  //
+  // Y se apaga DEL TODO al encenderse la ignicion, sin dejar rescoldo. El 15 %
+  // que quedaba antes no se leia como corona: el tone mapping ACES tine de
+  // pardo cualquier neutro muy oscuro, asi que las plumas estiradas se veian
+  // como manchas marrones cruzando el estallido, igual que suciedad en el
+  // objetivo. Una corona a medio apagar no aporta nada y ensucia el climax.
+  const corona = clamp01(1 - easeStep(ignicion));
 
   // Al cargarse, el anillo se estira hacia el ecuador y el encuadre pasa de
   // vertical a panoramico. Avisa al ojo de que va a pasar algo.
-  const coronaStretch = mix(1, 2.5, easeInOut(carga));
+  // Estirar a dos y medio aplastaba las plumas hasta convertirlas en barras
+  // rectas cruzando el encuadre, que se leian como rayadas en el objetivo. El
+  // gesto sigue estando; solo que insinuado.
+  const coronaStretch = mix(1, 1.55, easeInOut(carga));
 
   // El destello que atraviesa el disco. Se intensifica con la carga.
   const streak = clamp01(0.55 + easeInOut(carga) * 0.45) * (1 - easeStep(ignicion));
@@ -135,7 +143,7 @@ export function evaluate(t: number): EclipseState {
 
   // El estallido se VE antes de entenderse: la luz llega primero y la materia
   // despues. Se apaga en el primer tercio del humo.
-  const flash = clamp01(easeStep(ignicion) * (1 - easeSettle(humo) * 1.8));
+  const flash = clamp01(easeStep(ignicion) * (1 - easeSettle(humo) * 2.6));
 
   // El disco se retira TARDE, cuando el plasma ya esta fuera: durante unos
   // fotogramas conviven, y esa convivencia es la razon de que se lea como
