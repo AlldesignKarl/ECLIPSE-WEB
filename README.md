@@ -81,6 +81,11 @@ Variables de entorno en Vercel (Settings → Environment Variables):
 | `EMAIL_TO` | `alldesignkarl@gmail.com` (es el valor por defecto). |
 | `EMAIL_FROM` | Sin dominio propio: `Alldesign Karl <onboarding@resend.dev>` (por defecto). Con dominio verificado en Resend: por ejemplo `Alldesign Karl <presupuestos@tudominio.com>`. |
 
+**Sin `RESEND_API_KEY` el formulario funciona igual**: envía a través de
+[FormSubmit](https://formsubmit.co), que no necesita clave. La primera solicitud
+hace que FormSubmit mande a `alldesignkarl@gmail.com` un email de activación;
+tras pulsar «Activate Form» las solicitudes llegan directamente.
+
 Con el remitente de pruebas de Resend (`onboarding@resend.dev`) solo se puede
 enviar al email con el que se creó la cuenta de Resend: hay que registrarla con
 `alldesignkarl@gmail.com`. En local, `EMAIL_DRY_RUN=1 npm run dev` hace todo el

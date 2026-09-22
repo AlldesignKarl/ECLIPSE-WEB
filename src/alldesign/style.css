@@ -988,10 +988,10 @@ button {
 }
 .about__detail {
   margin: 0;
-  width: 70%;
+  width: 52%;
   margin-left: auto;
   overflow: hidden;
-  aspect-ratio: 900 / 582;
+  aspect-ratio: 4 / 5;
 }
 .about__detail img {
   width: 100%;
