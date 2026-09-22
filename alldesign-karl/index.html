@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#F1EBE1" />
+
+    <title>Alldesign Karl — Porcelana artesanal</title>
+    <meta
+      name="description"
+      content="Porcelana hecha a mano en Aragón. Piezas únicas modeladas, pintadas en azul cobalto y horneadas a alta temperatura, una a una."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Alldesign Karl" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content="Alldesign Karl — Porcelana artesanal" />
+    <meta property="og:description" content="La belleza de lo artesanal, en cada detalle. Hecho a mano en Aragón." />
+    <meta property="og:image" content="/alldesign-karl/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preload" href="/alldesign-karl/fonts/pinyon-script-normal-latin-cfbbdd.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/alldesign-karl/fonts/cormorant-garamond-normal-latin-2fed1d.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/alldesign-karl/sculpture.webp" as="image" type="image/webp" crossorigin="anonymous" />
+    <link rel="preload" href="/alldesign-karl/shards.png" as="image" type="image/png" crossorigin="anonymous" />
+  </head>
+  <body class="is-loading">
+    <a class="skip" href="#colecciones">Saltar a las colecciones</a>
+
+    <!-- Cortina de carga: se levanta cuando las texturas de la escultura estan en GPU. -->
+    <div class="loader" aria-hidden="true">
+      <span class="loader__mark">AK</span>
+      <span class="loader__line"><span class="loader__fill"></span></span>
+    </div>
+
+    <header class="nav" data-nav>
+      <a class="nav__logo" href="#inicio" aria-label="Alldesign Karl, inicio">AK</a>
+      <nav class="nav__links" aria-label="Principal">
+        <a href="#inicio" class="is-active">Inicio</a>
+        <a href="#colecciones">Colecciones</a>
+        <a href="#nosotros">Sobre nosotros</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+      <div class="nav__tools">
+        <button class="icon-btn" type="button" data-open="search" aria-label="Buscar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.4 15.4 20.5 20.5" /></svg>
+        </button>
+        <button class="icon-btn" type="button" data-open="bag" aria-label="Bolsa, 0 piezas">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8.5h13l-1 12h-11z" /><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5" /></svg>
+          <span class="icon-btn__count" data-bag-count>0</span>
+        </button>
+        <button class="icon-btn icon-btn--menu" type="button" data-open="menu" aria-label="Abrir menú">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5h17M3.5 12h17M3.5 16.5h17" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ============================================================
+           EXPERIENCIA: fragmentos → escultura
+           El escenario queda fijo mientras la seccion (muy alta) se
+           desplaza; el progreso del scroll es el progreso de la pieza.
+           ============================================================ -->
+      <section class="experience" id="inicio" aria-label="Alldesign Karl">
+        <div class="stage">
+          <canvas class="stage__canvas" aria-hidden="true"></canvas>
+          <img
+            class="stage__poster"
+            src="/alldesign-karl/sculpture-sm.webp"
+            alt=""
+            aria-hidden="true"
+            width="548"
+            height="792"
+          />
+
+          <div class="hero" data-hero>
+            <p class="hero__kicker" data-hero-item>
+              <span>Porcelana</span><i>·</i><span>Arte</span><i>·</i><span>Tradición</span>
+            </p>
+            <h1 class="hero__title" data-hero-item>Alldesign Karl</h1>
+            <div class="hero__rule" data-hero-item aria-hidden="true">
+              <span></span><svg viewBox="0 0 20 20"><path d="M10 0c.6 5.6 4.4 9.4 10 10-5.6.6-9.4 4.4-10 10-.6-5.6-4.4-9.4-10-10C5.6 9.4 9.4 5.6 10 0Z" /></svg><span></span>
+            </div>
+            <p class="hero__lead" data-hero-item>La belleza de lo artesanal,<br />en cada detalle.</p>
+            <a class="btn" href="#colecciones" data-hero-item data-magnetic>
+              <span>Descubre nuestras colecciones</span>
+              <svg viewBox="0 0 28 12" aria-hidden="true"><path d="M0 6h26M21 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+
+          <p class="corner corner--left" data-hero-corner>Hecho a mano<br />en Aragón</p>
+          <p class="corner corner--right" data-hero-corner>Cada pieza<br />cuenta una historia</p>
+          <div class="scroll-cue" data-hero-corner aria-hidden="true">
+            <span class="scroll-cue__line"></span>
+            <svg viewBox="0 0 20 20"><path d="M10 0c.6 5.6 4.4 9.4 10 10-5.6.6-9.4 4.4-10 10-.6-5.6-4.4-9.4-10-10C5.6 9.4 9.4 5.6 10 0Z" /></svg>
+          </div>
+
+          <!-- Contador discreto del ensamblaje, estilo ficha de museo. -->
+          <div class="assembly" data-assembly aria-hidden="true">
+            <span class="assembly__n" data-assembly-n>00</span>
+            <span class="assembly__of">/ <span data-assembly-total>38</span> fragmentos</span>
+          </div>
+
+          <article class="piece piece--a" data-piece="a">
+            <p class="kicker" data-line>La pieza</p>
+            <h2 class="piece__title" data-line>El arte de crear<br /><em>con las manos</em></h2>
+            <p data-line>Cada pieza nace de un proceso lento, preciso y profundamente artesanal.</p>
+            <p data-line>
+              Trabajamos la porcelana de forma cuidadosa, respetando los tiempos, las formas y cada
+              pequeño detalle que convierte una pieza en algo único.
+            </p>
+          </article>
+
+          <article class="piece piece--b" data-piece="b">
+            <p class="kicker" data-line>Pieza única · Nº 01</p>
+            <h2 class="piece__title" data-line>El arte<br /><em>de lo único</em></h2>
+            <p data-line>
+              <em>Flora</em> es un busto de porcelana modelado a mano y pintado pincelada a pincelada
+              con azul cobalto. La rama nace en el pecho, sube por el cuello y termina en la corona:
+              ninguna hoja se repite.
+            </p>
+            <dl class="specs" data-line>
+              <div><dt>Material</dt><dd>Porcelana esmaltada</dd></div>
+              <div><dt>Decoración</dt><dd>Cobalto a pincel</dd></div>
+              <div><dt>Cocción</dt><dd>1.280 °C</dd></div>
+              <div><dt>Edición</dt><dd>Pieza única</dd></div>
+            </dl>
+          </article>
+
+          <!-- Anotaciones: sus puntos se proyectan desde la escultura en cada fotograma. -->
+          <svg class="notes__lines" data-note-lines aria-hidden="true"></svg>
+          <ul class="notes" data-notes aria-hidden="true">
+            <li class="note" data-note="0.60,0.93"><b>I</b>Corona modelada pétalo a pétalo</li>
+            <li class="note" data-note="0.60,0.70"><b>II</b>Rostro en esmalte blanco</li>
+            <li class="note" data-note="0.62,0.30"><b>III</b>Rama de cobalto a pincel</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           COLECCIONES
+           ============================================================ -->
+      <section class="collections" id="colecciones">
+        <header class="section-head">
+          <p class="kicker" data-reveal>Colecciones</p>
+          <h2 class="display" data-reveal>Cuatro maneras<br /><em>de mirar la porcelana</em></h2>
+          <p class="section-head__text" data-reveal>
+            Series cortas, hechas por encargo o en ediciones mínimas. Ninguna pieza sale del taller
+            igual que la anterior.
+          </p>
+        </header>
+
+        <div class="collections__grid">
+          <a class="collection collection--1" href="#contacto" data-cursor="Ver">
+            <figure class="collection__media" data-mask>
+              <img src="/alldesign-karl/col-azul.webp" alt="Fragmento de cuenco de porcelana con flores azules y filo dorado" width="1200" height="750" loading="lazy" decoding="async" data-parallax />
+            </figure>
+            <div class="collection__caption">
+              <span class="collection__num">01</span>
+              <h3>Colección Azul</h3>
+              <p>Vajilla y cuencos pintados en cobalto</p>
+              <svg class="arrow" viewBox="0 0 40 12" aria-hidden="true"><path d="M0 6h38M33 1l5 5-5 5" /></svg>
+            </div>
+          </a>
+
+          <a class="collection collection--2" href="#contacto" data-cursor="Ver">
+            <figure class="collection__media" data-mask>
+              <img src="/alldesign-karl/col-botanica.webp" alt="Detalle de ramas y flores pintadas a mano sobre porcelana blanca" width="1200" height="1030" loading="lazy" decoding="async" data-parallax />
+            </figure>
+            <div class="collection__caption">
+              <span class="collection__num">02</span>
+              <h3>Colección Botánica</h3>
+              <p>Ramas, hojas y flores de la huerta aragonesa</p>
+              <svg class="arrow" viewBox="0 0 40 12" aria-hidden="true"><path d="M0 6h38M33 1l5 5-5 5" /></svg>
+            </div>
+          </a>
+
+          <a class="collection collection--3" href="#contacto" data-cursor="Ver">
+            <figure class="collection__media" data-mask>
+              <img src="/alldesign-karl/col-escultorica.webp" alt="Busto de porcelana blanca con decoración floral azul" width="1000" height="1300" loading="lazy" decoding="async" data-parallax />
+            </figure>
+            <div class="collection__caption">
+              <span class="collection__num">03</span>
+              <h3>Colección Escultórica</h3>
+              <p>Bustos y figuras de gran formato</p>
+              <svg class="arrow" viewBox="0 0 40 12" aria-hidden="true"><path d="M0 6h38M33 1l5 5-5 5" /></svg>
+            </div>
+          </a>
+
+          <a class="collection collection--4" href="#contacto" data-cursor="Ver">
+            <figure class="collection__media" data-mask>
+              <img src="/alldesign-karl/col-ediciones.webp" alt="Fragmentos de porcelana con filo de oro suspendidos en el aire" width="640" height="1400" loading="lazy" decoding="async" data-parallax />
+            </figure>
+            <div class="collection__caption">
+              <span class="collection__num">04</span>
+              <h3>Ediciones Especiales</h3>
+              <p>Piezas reparadas con oro, series numeradas</p>
+              <svg class="arrow" viewBox="0 0 40 12" aria-hidden="true"><path d="M0 6h38M33 1l5 5-5 5" /></svg>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           ARTESANIA: recorrido horizontal por las cinco fases
+           ============================================================ -->
+      <section class="craft" id="artesania">
+        <div class="craft__pin">
+          <header class="craft__head">
+            <p class="kicker" data-reveal>Artesanía</p>
+            <h2 class="display" data-reveal>Del barro<br /><em>a la pieza</em></h2>
+            <p class="craft__progress" aria-hidden="true"><span data-craft-bar></span></p>
+          </header>
+
+          <ol class="craft__track" data-craft-track>
+            <li class="step">
+              <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
+                <path class="gold" d="M30 170h140" />
+                <path d="M100 30v140M60 60h80" stroke-dasharray="3 5" />
+                <path d="M88 40c-6 0-10 6-10 14v8c0 12-26 22-26 58 0 28 20 42 48 42s48-14 48-42c0-36-26-46-26-58v-8c0-8-4-14-10-14" />
+                <path d="M146 150l26-100 6 2-26 100-8 6z" />
+              </svg>
+              <span class="step__num">I</span>
+              <h3>Diseño</h3>
+              <p>Todo empieza en el papel. Dibujamos la silueta, la proporción y el recorrido de cada rama antes de tocar el material.</p>
+            </li>
+            <li class="step">
+              <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
+                <ellipse cx="100" cy="164" rx="66" ry="12" />
+                <path class="gold" d="M34 164v8c0 7 30 12 66 12s66-5 66-12v-8" />
+                <path d="M84 44c-4 0-8 4-8 10v6c0 10-22 20-22 52 0 24 18 40 46 40s46-16 46-40c0-32-22-42-22-52v-6c0-6-4-10-8-10" />
+                <path d="M30 96c10-6 20-6 26 4M170 96c-10-6-20-6-26 4" />
+              </svg>
+              <span class="step__num">II</span>
+              <h3>Modelado</h3>
+              <p>La pasta de porcelana se trabaja a mano y en torno. Se deja secar despacio para que no se agriete, a veces durante semanas.</p>
+            </li>
+            <li class="step">
+              <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
+                <path d="M84 30c-4 0-8 4-8 10v6c0 10-26 22-26 58 0 30 20 50 50 50s50-20 50-50c0-36-26-48-26-58v-6c0-6-4-10-8-10" />
+                <path class="blue" d="M100 150c0-26 -4-44 6-66M104 110c10-4 18-2 22 6-8 4-16 2-22-6ZM102 94c-10-6-18-4-22 4 8 4 16 2 22-4ZM106 80c6-8 14-8 18-2-6 6-14 6-18 2Z" />
+                <path d="M150 40l30-24M150 40l-6 10 10-4z" />
+              </svg>
+              <span class="step__num">III</span>
+              <h3>Decoración</h3>
+              <p>El azul cobalto se aplica a pincel, en crudo. No hay plantillas: cada hoja se pinta de una sola vez y no admite rectificación.</p>
+            </li>
+            <li class="step">
+              <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
+                <path d="M36 176V86c0-36 28-60 64-60s64 24 64 60v90z" />
+                <path d="M36 176h128" />
+                <path d="M84 150c-3 0-6 3-6 7v5c0 6 10 10 22 10s22-4 22-10v-5c0-4-3-7-6-7" />
+                <path class="gold" d="M84 120c-8-12 6-18 0-30M100 116c-8-14 8-22 0-36M116 120c-8-12 6-18 0-30" />
+              </svg>
+              <span class="step__num">IV</span>
+              <h3>Horneado</h3>
+              <p>La cocción a 1.280 °C vitrifica la pasta y funde el esmalte con el azul. Es el momento en que la pieza deja de ser nuestra.</p>
+            </li>
+            <li class="step">
+              <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
+                <path d="M84 30c-4 0-8 4-8 10v6c0 10-26 22-26 58 0 30 20 50 50 50s50-20 50-50c0-36-26-48-26-58v-6c0-6-4-10-8-10" />
+                <path class="gold" d="M76 40h48M70 108c14 6 22-4 30 4s16 2 28-6" />
+                <path class="gold" d="M160 44c.4 5.6 3.4 8.6 9 9-5.6.4-8.6 3.4-9 9-.4-5.6-3.4-8.6-9-9 5.6-.4 8.6-3.4 9-9Z" />
+              </svg>
+              <span class="step__num">V</span>
+              <h3>Acabado</h3>
+              <p>Pulido, revisión a contraluz y, en las ediciones especiales, oro aplicado a mano. Solo entonces la pieza lleva nuestra firma.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SOBRE NOSOTROS
+           ============================================================ -->
+      <section class="about" id="nosotros">
+        <figure class="about__media" data-mask>
+          <img src="/alldesign-karl/taller.webp" alt="Rostro de porcelana mirando hacia arriba, coronado de flores azules" width="900" height="981" loading="lazy" decoding="async" data-parallax />
+        </figure>
+        <div class="about__text">
+          <p class="kicker" data-reveal>Sobre nosotros</p>
+          <blockquote class="quote" data-split>
+            Cada pieza nace de una idea, pero cobra vida a través de las manos.
+          </blockquote>
+          <p data-reveal>
+            Alldesign Karl es un pequeño taller de porcelana en Aragón. Trabajamos sin prisa y sin
+            moldes de serie: cada pieza se modela, se pinta y se hornea aquí, y pasa por las mismas
+            manos de principio a fin.
+          </p>
+          <p data-reveal>
+            Nos inspira la loza tradicional, las flores del campo y la idea de que un objeto puede
+            guardar el tiempo que costó hacerlo. Por eso firmamos cada pieza, y por eso ninguna es
+            igual a otra.
+          </p>
+          <p class="signature" data-reveal>Karl</p>
+          <figure class="about__detail" data-mask>
+            <img src="/alldesign-karl/corona.webp" alt="Detalle de la corona floral de porcelana" width="900" height="582" loading="lazy" decoding="async" />
+          </figure>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CTA
+           ============================================================ -->
+      <section class="cta" id="contacto">
+        <div class="cta__frags" aria-hidden="true">
+          <img class="cta__frag cta__frag--1" src="/alldesign-karl/frag-1.webp" alt="" width="415" height="348" loading="lazy" data-depth="0.9" />
+          <img class="cta__frag cta__frag--2" src="/alldesign-karl/frag-2.webp" alt="" width="168" height="101" loading="lazy" data-depth="0.5" />
+          <img class="cta__frag cta__frag--3" src="/alldesign-karl/frag-3.webp" alt="" width="120" height="140" loading="lazy" data-depth="0.3" />
+          <img class="cta__frag cta__frag--4" src="/alldesign-karl/frag-4.webp" alt="" width="147" height="140" loading="lazy" data-depth="0.6" />
+        </div>
+        <div class="cta__inner">
+          <p class="kicker" data-reveal>Piezas por encargo y ediciones únicas</p>
+          <h2 class="cta__title" data-split>Descubre nuestras colecciones</h2>
+          <a class="btn btn--solid" href="mailto:hola@alldesignkarl.com" data-reveal data-magnetic>
+            <span>Escríbenos</span>
+            <svg viewBox="0 0 28 12" aria-hidden="true"><path d="M0 6h26M21 1l5 5-5 5" /></svg>
+          </a>
+          <p class="cta__note" data-reveal>Respondemos personalmente, en un par de días.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__top">
+        <a class="footer__logo" href="#inicio">Alldesign Karl</a>
+        <p class="footer__claim">Porcelana hecha a mano<br />en Aragón</p>
+      </div>
+      <div class="footer__cols">
+        <nav aria-label="Pie">
+          <a href="#colecciones">Colecciones</a>
+          <a href="#nosotros">Sobre nosotros</a>
+          <a href="#contacto">Contacto</a>
+        </nav>
+        <nav aria-label="Redes y legal">
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
+          <a href="#privacidad">Privacidad</a>
+          <a href="#cookies">Cookies</a>
+        </nav>
+        <p class="footer__mail"><a href="mailto:hola@alldesignkarl.com">hola@alldesignkarl.com</a></p>
+      </div>
+      <div class="footer__bottom">
+        <span>© <span data-year></span> Alldesign Karl</span>
+        <span>Cada pieza cuenta una historia</span>
+      </div>
+    </footer>
+
+    <!-- Paneles: menu, busqueda y bolsa -->
+    <div class="panel panel--menu" data-panel="menu" role="dialog" aria-modal="true" aria-label="Menú" hidden>
+      <button class="panel__close" type="button" data-close aria-label="Cerrar">Cerrar</button>
+      <nav class="panel__menu">
+        <a href="#inicio" data-close><span>01</span>Inicio</a>
+        <a href="#colecciones" data-close><span>02</span>Colecciones</a>
+        <a href="#artesania" data-close><span>03</span>Artesanía</a>
+        <a href="#nosotros" data-close><span>04</span>Sobre nosotros</a>
+        <a href="#contacto" data-close><span>05</span>Contacto</a>
+      </nav>
+      <p class="panel__foot">Hecho a mano en Aragón</p>
+    </div>
+
+    <div class="panel panel--search" data-panel="search" role="dialog" aria-modal="true" aria-label="Buscar" hidden>
+      <button class="panel__close" type="button" data-close aria-label="Cerrar">Cerrar</button>
+      <form class="search" role="search" data-search>
+        <label class="kicker" for="q">Buscar en el catálogo</label>
+        <input id="q" name="q" type="search" placeholder="Busto, cuenco, azul…" autocomplete="off" />
+        <ul class="search__results" data-search-results></ul>
+      </form>
+    </div>
+
+    <div class="panel panel--bag" data-panel="bag" role="dialog" aria-modal="true" aria-label="Bolsa" hidden>
+      <button class="panel__close" type="button" data-close aria-label="Cerrar">Cerrar</button>
+      <p class="kicker">Tu bolsa</p>
+      <p class="panel__empty">Todavía no has elegido ninguna pieza.</p>
+      <a class="btn" href="#colecciones" data-close><span>Ver colecciones</span><svg viewBox="0 0 28 12" aria-hidden="true"><path d="M0 6h26M21 1l5 5-5 5" /></svg></a>
+    </div>
+
+    <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <script type="module" src="/src/alldesign/main.ts"></script>
+  </body>
+</html>
