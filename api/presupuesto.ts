@@ -20,7 +20,7 @@ import {
   validateQuote,
   type QuoteFile,
   type QuotePayload,
-} from '../src/alldesign/quote-config';
+} from '../src/alldesign/quote-config.js';
 
 // Variables de entorno de Vercel. Se declara aqui para no depender de los
 // tipos de Node al compilar la funcion.
