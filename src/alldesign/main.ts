@@ -2,6 +2,7 @@ import './style.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import { applyContact } from './contact';
 import { SCRIPT } from './script';
 import { Stage, type StageFrame } from './stage';
 
@@ -23,6 +24,7 @@ const frozen = params.has('s');
 document.documentElement.classList.toggle('is-touch', coarse);
 document.documentElement.classList.toggle('is-reduced', reduced);
 $('[data-year]').textContent = String(new Date().getFullYear());
+applyContact();
 
 // ---------------------------------------------------------------------------
 // Scroll suave. En tactil se deja el nativo: es mas fluido y no pelea con el
@@ -443,6 +445,7 @@ const CATALOG = [
   { t: 'Platos de huerta aragonesa', c: 'Colección Botánica', href: '#colecciones' },
   { t: 'Figuras de gran formato', c: 'Colección Escultórica', href: '#colecciones' },
   { t: 'Encargos personalizados', c: 'Contacto', href: '#contacto' },
+  { t: 'Solicitar presupuesto para empresas', c: 'Presupuesto', href: '/alldesign-karl/presupuesto/' },
 ];
 
 function panels() {

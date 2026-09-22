@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#F4EEE4" />
+    <link rel="icon" href="/alldesign-karl/favicon.svg" type="image/svg+xml" />
+
+    <title>Pedir presupuesto — Alldesign Karl</title>
+    <meta
+      name="description"
+      content="Solicita un presupuesto para tu empresa: regalos corporativos, decoración, pedidos personalizados y pedidos mayoristas de porcelana artesanal."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Alldesign Karl" />
+    <meta property="og:title" content="Pedir presupuesto — Alldesign Karl" />
+    <meta property="og:image" content="/alldesign-karl/og.jpg" />
+
+    <link rel="preload" href="/alldesign-karl/fonts/cormorant-garamond-normal-latin-2fed1d.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/alldesign-karl/fonts/pinyon-script-normal-latin-cfbbdd.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body class="quote-page">
+    <a class="skip" href="#solicitud">Saltar al formulario</a>
+
+    <div class="quote">
+      <!-- Imagen de la izquierda. Para cambiarla basta con sustituir
+           public/alldesign-karl/presupuesto.webp (vertical, unos 1000 x 1300 px o
+           mayor) y actualizar el alt. No lleva texto encima a proposito. -->
+      <figure class="quote__media">
+        <img
+          src="/alldesign-karl/presupuesto.webp"
+          alt="Busto de porcelana blanca pintado a mano en azul, fotografiado sobre fondo crema"
+          width="1000"
+          height="1300"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </figure>
+
+      <main class="quote__panel" id="solicitud">
+        <header class="quote__top">
+          <a class="quote__logo" href="/alldesign-karl/" aria-label="Alldesign Karl, volver a la web">AK</a>
+          <a class="quote__back" href="/alldesign-karl/">
+            <svg viewBox="0 0 28 12" aria-hidden="true"><path d="M28 6H2M7 1 2 6l5 5" /></svg>
+            <span>Volver a la web</span>
+          </a>
+        </header>
+
+        <div class="quote__body" data-quote-body>
+          <section class="quote__intro">
+            <p class="q-kicker">Para empresas</p>
+            <h1 class="quote__title">Pedir <em>presupuesto</em></h1>
+            <p class="quote__lead">
+              Regalos corporativos, decoración, piezas personalizadas o pedidos en cantidad. Cuéntanos
+              qué necesita tu empresa y te responderemos personalmente con una propuesta.
+            </p>
+          </section>
+
+          <!-- Progreso -->
+          <ol class="steps" aria-label="Pasos de la solicitud" data-steps>
+            <li class="steps__item is-current" data-step-label="1"><span>01</span>Quién eres</li>
+            <li class="steps__item" data-step-label="2"><span>02</span>Tu proyecto</li>
+            <li class="steps__item" data-step-label="3"><span>03</span>Revisión</li>
+          </ol>
+          <div class="progress" aria-hidden="true"><span data-progress></span></div>
+
+          <form class="qform" data-quote-form novalidate>
+            <!-- Trampa para bots: fuera de la vista y del teclado. -->
+            <div class="qform__trap" aria-hidden="true">
+              <label>No rellenes este campo <input type="text" name="website2" tabindex="-1" autocomplete="off" /></label>
+            </div>
+
+            <!-- ============================ PASO 1 ============================ -->
+            <fieldset class="qstep is-active" data-step="1">
+              <legend class="qstep__title">Cuéntanos quién eres</legend>
+              <div class="qgrid">
+                <div class="field field--full">
+                  <label for="f-nombre">Nombre y apellidos <b aria-hidden="true">*</b></label>
+                  <input id="f-nombre" name="nombre" type="text" autocomplete="name" required maxlength="120" />
+                </div>
+                <div class="field">
+                  <label for="f-cargo">Cargo / puesto</label>
+                  <input id="f-cargo" name="cargo" type="text" autocomplete="organization-title" maxlength="120" />
+                </div>
+                <div class="field">
+                  <label for="f-empresa">Nombre de empresa <b aria-hidden="true">*</b></label>
+                  <input id="f-empresa" name="empresa" type="text" autocomplete="organization" required maxlength="160" />
+                </div>
+                <div class="field">
+                  <label for="f-email">Email profesional <b aria-hidden="true">*</b></label>
+                  <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="160" />
+                </div>
+                <div class="field">
+                  <label for="f-telefono">Teléfono <b aria-hidden="true">*</b></label>
+                  <input id="f-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" required maxlength="40" />
+                </div>
+                <div class="field">
+                  <label for="f-cif">CIF / NIF <small>opcional</small></label>
+                  <input id="f-cif" name="cif" type="text" maxlength="30" autocapitalize="characters" />
+                </div>
+                <div class="field">
+                  <label for="f-web">Web de la empresa <small>opcional</small></label>
+                  <input id="f-web" name="web" type="url" inputmode="url" placeholder="www.tuempresa.com" maxlength="200" />
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- ============================ PASO 2 ============================ -->
+            <fieldset class="qstep" data-step="2" hidden>
+              <legend class="qstep__title">Cuéntanos sobre tu proyecto</legend>
+
+              <div class="field field--full" role="radiogroup" aria-labelledby="l-producto" data-field="producto">
+                <p class="field__label" id="l-producto">Producto o servicio que te interesa <b aria-hidden="true">*</b></p>
+                <div class="chips" data-products></div>
+              </div>
+
+              <div class="qgrid">
+                <div class="field">
+                  <label for="f-cantidad">Cantidad aproximada</label>
+                  <input id="f-cantidad" name="cantidad" type="text" placeholder="Ej. 150 unidades" maxlength="80" />
+                </div>
+                <div class="field">
+                  <label for="f-tipo">Tipo de proyecto</label>
+                  <div class="select"><select id="f-tipo" name="tipo" data-types><option value="">Selecciona</option></select></div>
+                </div>
+                <div class="field">
+                  <label for="f-fecha">¿Para cuándo lo necesitas?</label>
+                  <input id="f-fecha" name="fecha" type="date" />
+                </div>
+                <div class="field">
+                  <label for="f-presupuesto">Presupuesto aproximado <small>opcional</small></label>
+                  <div class="select"><select id="f-presupuesto" name="presupuesto" data-budgets><option value="">Selecciona</option></select></div>
+                </div>
+                <div class="field field--full">
+                  <label for="f-ciudad">Ciudad / provincia de entrega</label>
+                  <input id="f-ciudad" name="ciudad" type="text" autocomplete="address-level2" maxlength="120" />
+                </div>
+                <div class="field field--full">
+                  <label for="f-descripcion">Descripción del proyecto <b aria-hidden="true">*</b></label>
+                  <textarea id="f-descripcion" name="descripcion" rows="5" maxlength="4000" required placeholder="Qué necesitáis, para qué ocasión, colores, personalización, embalaje…"></textarea>
+                  <span class="field__count" data-count>0 / 4000</span>
+                </div>
+              </div>
+
+              <div class="field field--full" data-field="archivos">
+                <p class="field__label">Archivos de referencia <small>opcional</small></p>
+                <label class="drop" data-drop>
+                  <input type="file" name="archivos" multiple data-files />
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
+                  <span><strong>Adjunta referencias, diseños o catálogos</strong><em>Arrastra aquí o pulsa para elegir</em></span>
+                  <small data-files-hint></small>
+                </label>
+                <ul class="files" data-files-list></ul>
+              </div>
+            </fieldset>
+
+            <!-- ============================ PASO 3 ============================ -->
+            <fieldset class="qstep" data-step="3" hidden>
+              <legend class="qstep__title">Revisa tu solicitud</legend>
+              <div class="review" data-review></div>
+
+              <div class="checks">
+                <label class="check" data-field="privacidad">
+                  <input type="checkbox" name="privacidad" required />
+                  <span class="check__box" aria-hidden="true"></span>
+                  <span>He leído y acepto la <a href="/alldesign-karl/privacidad/" target="_blank" rel="noopener">Política de Privacidad</a>. <b aria-hidden="true">*</b></span>
+                </label>
+                <label class="check">
+                  <input type="checkbox" name="comunicaciones" />
+                  <span class="check__box" aria-hidden="true"></span>
+                  <span>Acepto recibir información relacionada con mi solicitud.</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <p class="qform__alert" role="alert" data-alert hidden></p>
+
+            <div class="qform__nav">
+              <button class="qbtn qbtn--ghost" type="button" data-prev hidden>
+                <svg viewBox="0 0 28 12" aria-hidden="true"><path d="M28 6H2M7 1 2 6l5 5" /></svg>
+                <span>Volver</span>
+              </button>
+              <button class="qbtn" type="button" data-next>
+                <span>Continuar</span>
+                <svg viewBox="0 0 28 12" aria-hidden="true"><path d="M0 6h26M21 1l5 5-5 5" /></svg>
+              </button>
+              <button class="qbtn" type="submit" data-submit hidden>
+                <span data-submit-label>Enviar solicitud</span>
+                <i class="qbtn__spin" aria-hidden="true"></i>
+              </button>
+            </div>
+            <p class="qform__req"><b aria-hidden="true">*</b> Campos obligatorios</p>
+          </form>
+
+          <aside class="quote__foot">
+            <div class="quote__contact">
+              <p class="q-kicker">¿Prefieres hablar?</p>
+              <a class="qlink" data-contact="phone" data-contact-text href="tel:+34661307918">661 30 79 18</a>
+              <a class="qlink" data-contact="email" data-contact-text href="mailto:alldesignkarl@gmail.com">alldesignkarl@gmail.com</a>
+              <a class="qlink qlink--ig" data-contact="instagram" href="https://www.instagram.com/alldesignkarl/" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.2" cy="6.8" r="0.9" /></svg>
+                <span>@alldesignkarl</span>
+              </a>
+            </div>
+            <div class="quote__people">
+              <p class="q-kicker">Detrás del taller</p>
+              <p>
+                <span class="quote__names">Vanessa Pueyo Escolano<br />Carlos Lafuente Pueyo</span>
+                Un proyecto familiar que nació en casa y hoy trabaja, sobre todo, con otras empresas.
+              </p>
+            </div>
+          </aside>
+        </div>
+
+        <!-- Confirmacion -->
+        <section class="done" data-done hidden tabindex="-1" aria-labelledby="done-title">
+          <span class="done__mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" /><path d="M20 33l8 8 16-18" /></svg>
+          </span>
+          <p class="q-kicker">Alldesign Karl</p>
+          <h2 class="done__title" id="done-title">Solicitud <em>enviada</em></h2>
+          <p class="done__text">
+            Gracias por contactar con nosotros. Hemos recibido correctamente tu solicitud y nos pondremos en
+            contacto contigo.
+          </p>
+          <a class="qbtn" href="/alldesign-karl/">
+            <span>Volver a la web</span>
+            <svg viewBox="0 0 28 12" aria-hidden="true"><path d="M0 6h26M21 1l5 5-5 5" /></svg>
+          </a>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/src/alldesign/quote.ts"></script>
+  </body>
+</html>

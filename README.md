@@ -59,6 +59,33 @@ Pendiente de datos reales: fotografía de producto de las colecciones (las
 actuales salen de las dos imágenes de referencia), correo de contacto
 (`hola@alldesignkarl.com` es provisional) y el perfil de Instagram.
 
+### Pedir presupuesto (`/alldesign-karl/presupuesto/`)
+
+Formulario en tres pasos para empresas (sin cuentas, registro ni contraseñas).
+La página es `alldesign-karl/presupuesto/index.html` con `src/alldesign/quote.ts`
+y `quote.css`; la Política de Privacidad está en `alldesign-karl/privacidad/`.
+Las opciones de los selectores y el límite de archivos están en
+`src/alldesign/quote-config.ts`, y el teléfono, el email y el Instagram en
+`src/alldesign/contact.ts`. La imagen de la izquierda es
+`public/alldesign-karl/presupuesto.webp`: se sustituye por la definitiva con el
+mismo nombre (vertical, 1000 x 1300 px o más).
+
+El envío lo hace la función de Vercel `api/presupuesto.ts`: valida otra vez los
+datos, comprueba el contenido real de los adjuntos (JPG, PNG, WEBP o PDF, hasta
+3 archivos y 3 MB en total) y manda el email con [Resend](https://resend.com).
+Variables de entorno en Vercel (Settings → Environment Variables):
+
+| Variable | Valor |
+| --- | --- |
+| `RESEND_API_KEY` | La clave de la API de Resend. **Obligatoria.** |
+| `EMAIL_TO` | `alldesignkarl@gmail.com` (es el valor por defecto). |
+| `EMAIL_FROM` | Sin dominio propio: `Alldesign Karl <onboarding@resend.dev>` (por defecto). Con dominio verificado en Resend: por ejemplo `Alldesign Karl <presupuestos@tudominio.com>`. |
+
+Con el remitente de pruebas de Resend (`onboarding@resend.dev`) solo se puede
+enviar al email con el que se creó la cuenta de Resend: hay que registrarla con
+`alldesignkarl@gmail.com`. En local, `EMAIL_DRY_RUN=1 npm run dev` hace todo el
+proceso y escribe el email en la terminal en lugar de enviarlo.
+
 ## Arrancar
 
 ```bash

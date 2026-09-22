@@ -1033,6 +1033,17 @@ button {
   font-size: 13px;
   color: var(--ink-2);
 }
+.cta__note a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+.cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
 .cta__frags {
   --cx: 0;
   --cy: 0;
@@ -1126,6 +1137,10 @@ button {
 .footer__mail {
   margin: 0;
   justify-self: end;
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+  align-content: start;
 }
 .footer__bottom {
   display: flex;
@@ -1543,6 +1558,7 @@ button {
   .footer__mail {
     grid-column: 1 / -1;
     justify-self: start;
+    justify-items: start;
   }
   .footer__bottom {
     flex-direction: column;
