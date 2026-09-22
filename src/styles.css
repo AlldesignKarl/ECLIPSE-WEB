@@ -636,6 +636,21 @@ a:hover {
   line-height: 1.66;
   color: var(--ink-2);
 }
+.trabajo__link {
+  align-self: flex-start;
+  margin-top: 22px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  text-decoration: none;
+  border-bottom: 1px solid var(--blue-dim);
+  padding-bottom: 4px;
+}
+.trabajo__link:hover {
+  border-bottom-color: var(--blue);
+}
 
 .archive {
   list-style: none;

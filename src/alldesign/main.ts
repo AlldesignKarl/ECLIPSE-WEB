@@ -44,9 +44,11 @@ $$<HTMLAnchorElement>('a[href^="#"]').forEach((a) =>
     const el = document.querySelector(id);
     if (!el) return;
     e.preventDefault();
-    // "Descubre" desde la portada: primero el espectaculo. Saltar directamente
-    // al catalogo se hace con el menu.
-    if (lenis) lenis.scrollTo(el as HTMLElement, { duration: 2.2 });
+    if (lenis) {
+      // Desde un panel abierto Lenis esta parado: se reanuda antes de saltar.
+      lenis.start();
+      lenis.scrollTo(el as HTMLElement, { duration: 2.2 });
+    }
     else (el as HTMLElement).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
   }),
 );
@@ -60,6 +62,7 @@ const counterN = $('[data-assembly-n]');
 const notes = $$('[data-note]');
 const noteLines = $<SVGSVGElement>('[data-note-lines]');
 let stage: Stage | null = null;
+let stageInView = true;
 
 function hasWebGL() {
   try {
@@ -105,9 +108,16 @@ async function bootStage() {
   await stage.load();
   stage.start();
 
-  const io = new IntersectionObserver(([e]) => stage!.setVisible(e.isIntersecting), { rootMargin: '10% 0px' });
+  // Fuera de pantalla o con la pestaña oculta no se pinta nada.
+  const io = new IntersectionObserver(
+    ([e]) => {
+      stageInView = e.isIntersecting;
+      if (!document.body.classList.contains('has-panel')) stage!.setVisible(stageInView);
+    },
+    { rootMargin: '10% 0px' },
+  );
   io.observe(stageEl);
-  document.addEventListener('visibilitychange', () => !document.hidden && stage!.setVisible(true));
+  document.addEventListener('visibilitychange', () => !document.hidden && stage!.setVisible(stageInView));
 
   let rw = innerWidth;
   let rh = innerHeight;
@@ -164,6 +174,14 @@ function buildStageTimeline() {
     .fromTo('[data-note]', { autoAlpha: 0, x: 18 }, { autoAlpha: 1, x: 0, stagger: 0.012, duration: 0.04 }, b1 - 0.02)
     .fromTo(noteLines, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.04 }, b1 - 0.01)
     .set({}, {}, 1);
+
+  // Sin WebGL: la escultura es una imagen fija que acompaña a los textos.
+  if (document.documentElement.classList.contains('no-webgl')) {
+    const wide = desktop.matches;
+    tl.fromTo('.stage__poster', { autoAlpha: 0.14, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'power1.inOut' }, 0.05)
+      .to('.stage__poster', { xPercent: wide ? -62 : 0, yPercent: wide ? 0 : -22, scale: wide ? 1 : 0.7, duration: 0.08 }, a0)
+      .to('.stage__poster', { xPercent: wide ? 45 : 0, duration: 0.08 }, b0);
+  }
   if (frozen) tl.progress(parseFloat(params.get('s')!) || 0);
 }
 
@@ -289,7 +307,7 @@ function craft() {
   const mm = gsap.matchMedia();
 
   mm.add('(min-width: 900px)', () => {
-    const dist = () => track.scrollWidth - innerWidth + parseFloat(getComputedStyle(track).paddingLeft);
+    const dist = () => track.scrollWidth - innerWidth;
     const tween = gsap.to(track, {
       x: () => -dist(),
       ease: 'none',
@@ -435,6 +453,7 @@ function panels() {
       },
     });
     document.body.classList.remove('has-panel');
+    stage?.setVisible(stageInView);
     lenis?.start();
     opener?.focus();
   };
@@ -446,10 +465,13 @@ function panels() {
     opener = from;
     p.hidden = false;
     document.body.classList.add('has-panel');
+    // El panel tapa la pantalla entera: el escenario deja de pintar mientras.
+    stage?.setVisible(false);
     lenis?.stop();
     gsap.fromTo(p, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: 'power2.out' });
+    // Solo opacidad: con visibility oculta el campo de busqueda no acepta foco.
     gsap.from($$('.panel__menu a, .search > *, .panel > p, .panel > .btn', p), {
-      autoAlpha: 0,
+      opacity: 0,
       y: 30,
       stagger: 0.06,
       duration: 0.9,

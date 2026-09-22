@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#F1EBE1" />
+    <link rel="icon" href="/alldesign-karl/favicon.svg" type="image/svg+xml" />
 
     <title>Alldesign Karl — Porcelana artesanal</title>
     <meta
@@ -21,7 +22,9 @@
 
     <link rel="preload" href="/alldesign-karl/fonts/pinyon-script-normal-latin-cfbbdd.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/alldesign-karl/fonts/cormorant-garamond-normal-latin-2fed1d.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/alldesign-karl/sculpture.webp" as="image" type="image/webp" crossorigin="anonymous" />
+    <!-- La escultura en dos tamaños: la misma regla que usa el escenario para elegir. -->
+    <link rel="preload" href="/alldesign-karl/sculpture.webp" as="image" type="image/webp" crossorigin="anonymous" media="(pointer: fine) and (min-width: 760px)" />
+    <link rel="preload" href="/alldesign-karl/sculpture-sm.webp" as="image" type="image/webp" crossorigin="anonymous" media="(pointer: coarse), (max-width: 759px)" />
     <link rel="preload" href="/alldesign-karl/shards.png" as="image" type="image/png" crossorigin="anonymous" />
   </head>
   <body class="is-loading">
@@ -212,8 +215,9 @@
             <p class="craft__progress" aria-hidden="true"><span data-craft-bar></span></p>
           </header>
 
+          <div class="craft__viewport">
           <ol class="craft__track" data-craft-track>
-            <li class="step">
+            <li class="step" data-n="I">
               <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
                 <path class="gold" d="M30 170h140" />
                 <path d="M100 30v140M60 60h80" stroke-dasharray="3 5" />
@@ -224,7 +228,7 @@
               <h3>Diseño</h3>
               <p>Todo empieza en el papel. Dibujamos la silueta, la proporción y el recorrido de cada rama antes de tocar el material.</p>
             </li>
-            <li class="step">
+            <li class="step" data-n="II">
               <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
                 <ellipse cx="100" cy="164" rx="66" ry="12" />
                 <path class="gold" d="M34 164v8c0 7 30 12 66 12s66-5 66-12v-8" />
@@ -235,7 +239,7 @@
               <h3>Modelado</h3>
               <p>La pasta de porcelana se trabaja a mano y en torno. Se deja secar despacio para que no se agriete, a veces durante semanas.</p>
             </li>
-            <li class="step">
+            <li class="step" data-n="III">
               <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
                 <path d="M84 30c-4 0-8 4-8 10v6c0 10-26 22-26 58 0 30 20 50 50 50s50-20 50-50c0-36-26-48-26-58v-6c0-6-4-10-8-10" />
                 <path class="blue" d="M100 150c0-26 -4-44 6-66M104 110c10-4 18-2 22 6-8 4-16 2-22-6ZM102 94c-10-6-18-4-22 4 8 4 16 2 22-4ZM106 80c6-8 14-8 18-2-6 6-14 6-18 2Z" />
@@ -245,7 +249,7 @@
               <h3>Decoración</h3>
               <p>El azul cobalto se aplica a pincel, en crudo. No hay plantillas: cada hoja se pinta de una sola vez y no admite rectificación.</p>
             </li>
-            <li class="step">
+            <li class="step" data-n="IV">
               <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
                 <path d="M36 176V86c0-36 28-60 64-60s64 24 64 60v90z" />
                 <path d="M36 176h128" />
@@ -256,7 +260,7 @@
               <h3>Horneado</h3>
               <p>La cocción a 1.280 °C vitrifica la pasta y funde el esmalte con el azul. Es el momento en que la pieza deja de ser nuestra.</p>
             </li>
-            <li class="step">
+            <li class="step" data-n="V">
               <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
                 <path d="M84 30c-4 0-8 4-8 10v6c0 10-26 22-26 58 0 30 20 50 50 50s50-20 50-50c0-36-26-48-26-58v-6c0-6-4-10-8-10" />
                 <path class="gold" d="M76 40h48M70 108c14 6 22-4 30 4s16 2 28-6" />
@@ -267,6 +271,7 @@
               <p>Pulido, revisión a contraluz y, en las ediciones especiales, oro aplicado a mano. Solo entonces la pieza lleva nuestra firma.</p>
             </li>
           </ol>
+          </div>
         </div>
       </section>
 

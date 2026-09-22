@@ -11,6 +11,43 @@ muestra de lo que se le puede construir.
 La propuesta creativa y tecnica completa, con el analisis de la referencia y el
 guion de tiempos, vive en el lienzo de diseno que acompana a este repositorio.
 
+## Alldesign Karl (`/alldesign-karl/`)
+
+La web de un trabajo del estudio vive en el mismo proyecto como segunda página
+de Vite: `alldesign-karl/index.html`, con el código en `src/alldesign/` y los
+recursos en `public/alldesign-karl/`. Con `npm run dev` se abre en
+http://localhost:5173/alldesign-karl/.
+
+**La idea.** Los fragmentos de porcelana de la portada son, literalmente,
+trozos de la escultura. `scripts/build-shards.py` recorta el busto (sin fondo)
+y lo parte en 38 fragmentos con grietas irregulares; `shards.png` guarda en
+cada píxel a qué fragmento pertenece y a qué distancia está del borde. En
+WebGL cada fragmento es una instancia que descarta todo lo que no es suyo, se
+curva como una concha, lleva filo de oro y flota. El scroll lo lleva por una
+curva hasta su sitio; como cada píxel pertenece a un solo fragmento, al
+encajar la escultura queda sin costuras. Al final las juntas brillan en oro
+(kintsugi) y se desvanecen.
+
+| Archivo | Qué hace |
+| --- | --- |
+| `src/alldesign/stage.ts` | El escenario y **el guion** (`SCRIPT`): cuándo empieza y acaba el ensamblaje, el oro, el barrido de luz y los textos. Todo es función pura del progreso: se puede subir y bajar. |
+| `src/alldesign/shaders.ts` | Seda de fondo, fragmentos y escultura entera. |
+| `src/alldesign/main.ts` | Lenis + GSAP ScrollTrigger: progreso del escenario, capa de textos, colecciones, artesanía en horizontal, paneles, cursor. |
+| `scripts/build-shards.py` | Recorte, fragmentación y datos de los fragmentos. Necesita `pillow`, `numpy`, `scipy` y la máscara de `rembg` (modelo `isnet-general-use`). |
+| `scripts/build-editorial.py` | Fotografías provisionales de colecciones y taller, sacadas de las referencias. |
+
+Herramientas: `?s=0.5` congela la pieza en ese punto del guion (0 portada,
+0.47 escultura completa, 1 final); `?bg` muestra solo la seda; en consola,
+`__ak()` da el estado del escenario.
+
+Móvil: misma idea con la textura a media resolución, sin paralaje de puntero y
+con los textos bajo la escultura. Sin WebGL se sirve la escultura como imagen
+fija; con `prefers-reduced-motion` los fragmentos no vuelan, se funden.
+
+Pendiente de datos reales: fotografía de producto de las colecciones (las
+actuales salen de las dos imágenes de referencia), correo de contacto
+(`hola@alldesignkarl.com` es provisional) y el perfil de Instagram.
+
 ## Arrancar
 
 ```bash

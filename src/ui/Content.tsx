@@ -129,6 +129,9 @@ export function Content() {
               sobre la portada y se recomponen al desplazarse, porque la marca vende precisamente
               eso: que cada pieza tiene una historia.
             </p>
+            <a className="trabajo__link" href="/alldesign-karl/">
+              Ver la web en vivo →
+            </a>
           </div>
         </article>
 
