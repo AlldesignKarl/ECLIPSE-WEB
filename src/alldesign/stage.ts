@@ -1,46 +1,16 @@
-// El escenario: fragmentos de porcelana que flotan y, con el scroll, encajan
-// hasta reconstruir la escultura.
+// El escenario: fragmentos de porcelana que flotan y, con el scroll, van
+// encontrando su sitio uno a uno hasta reconstruir la escultura.
 //
 // Toda la pieza es una funcion pura del progreso `s` (0..1) mas el tiempo, que
 // solo mueve la flotacion y la seda. Si el usuario sube, los fragmentos vuelven
-// exactamente a donde estaban: no hay estado que deshacer.
+// exactamente a donde estaban, en orden inverso: no hay estado que deshacer.
+//
+// No existe ninguna capa con la escultura entera. Lo que se ve al final son los
+// 38 fragmentos, cada uno en su sitio: la escultura la construyen ellos.
 
 import * as THREE from 'three';
-import {
-  sculptFragment,
-  sculptVertex,
-  shardFragment,
-  shardVertex,
-  silkFragment,
-  silkVertex,
-} from './shaders';
-
-type Box = [number, number, number, number];
-interface ShardDef {
-  id: number;
-  box: Box;
-  c: [number, number];
-  a: number;
-}
-interface ShardData {
-  w: number;
-  h: number;
-  count: number;
-  shards: ShardDef[];
-}
-
-// Guion. Cambiar el ritmo de la pieza se hace aqui y en ningun otro sitio.
-export const SCRIPT = {
-  assembleStart: 0.035,
-  assembleEnd: 0.47,
-  maxDelay: 0.36, // retraso del ultimo fragmento, en unidades de ensamblaje
-  seamPeak: 0.505,
-  seamEnd: 0.6,
-  sweep: [0.485, 0.6] as const,
-  hold: [0.5, 0.6] as const,
-  pieceA: [0.6, 0.68] as const,
-  pieceB: [0.78, 0.86] as const,
-};
+import { SCRIPT, SHARDS, type ShardData, type ShardDef } from './script';
+import { shardFragment, shardVertex, silkFragment, silkVertex } from './shaders';
 
 const FOV = 30;
 const CAM_Z = 10;
@@ -54,6 +24,10 @@ const smooth = (a: number, b: number, x: number) => {
 // Entrada lenta, planeo largo y aterrizaje muy suave: nada de rebote.
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+// Viaje de un fragmento: arranca despacio, como si se despegara, y la mayor
+// parte del recorrido es una llegada larga que frena hasta posarse. Velocidad
+// cero en los dos extremos.
+const easeTravel = (u: number) => (1 - u) * u * u + u * (1 - Math.pow(1 - u, 3));
 const damp = (a: number, b: number, lambda: number, dt: number) =>
   a + (b - a) * (1 - Math.exp(-lambda * dt));
 
@@ -70,15 +44,19 @@ function mulberry(seed: number) {
 
 interface Shard {
   def: ShardDef;
+  /** Posicion en el orden de montaje: 0 es la primera en encajar. */
+  seq: number;
+  win: readonly [number, number];
   home: THREE.Vector3;
   start: THREE.Vector3;
-  ctrl: THREE.Vector3;
+  c1: THREE.Vector3;
+  c2: THREE.Vector3;
+  settle: number;
   qStart: THREE.Quaternion;
   spinAxis: THREE.Vector3;
   spin: number;
   scaleStart: number;
   bend: number;
-  delay: number;
   depth: number; // 0 lejos .. 1 cerca, para el paralaje del puntero
   // flotacion
   f: [number, number, number, number, number, number];
@@ -112,13 +90,13 @@ export class Stage {
   private camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
   private group = new THREE.Group();
   private silk!: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
-  private sculpt!: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
   private mesh!: THREE.InstancedMesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
   private aShard!: THREE.InstancedBufferAttribute;
   private aDyn!: THREE.InstancedBufferAttribute;
   private aAlpha!: THREE.InstancedBufferAttribute;
   private shards: Shard[] = [];
-  private data!: ShardData;
+  private data: ShardData = SHARDS;
+  private sealed = new Float32Array(64);
   private order: number[] = [];
 
   private target = 0;
@@ -150,6 +128,7 @@ export class Stage {
   private tmpV = new THREE.Vector3();
   private tmpS = new THREE.Vector3();
   private qId = new THREE.Quaternion();
+  private zAxis = new THREE.Vector3(0, 0, 1);
 
   constructor(opts: StageOptions) {
     this.opts = opts;
@@ -175,12 +154,10 @@ export class Stage {
   async load() {
     const base = this.opts.base;
     const texLoader = new THREE.TextureLoader();
-    const [color, dataImg, data] = await Promise.all([
+    const [color, dataImg] = await Promise.all([
       texLoader.loadAsync(`${base}/${this.opts.mobile ? 'sculpture-sm' : 'sculpture'}.webp`),
       new THREE.ImageLoader().loadAsync(`${base}/shards.png`),
-      fetch(`${base}/shards.json`).then((r) => r.json() as Promise<ShardData>),
     ]);
-    this.data = data;
 
     color.colorSpace = THREE.NoColorSpace;
     color.generateMipmaps = true;
@@ -231,28 +208,6 @@ export class Stage {
     this.silk.renderOrder = -10;
     this.scene.add(this.silk);
 
-    // Escultura entera (relevo cuando todo ha encajado)
-    this.sculpt = new THREE.Mesh(
-      new THREE.PlaneGeometry(1, 1),
-      new THREE.ShaderMaterial({
-        vertexShader: sculptVertex,
-        fragmentShader: sculptFragment,
-        transparent: true,
-        depthWrite: false,
-        uniforms: {
-          uColor: { value: color },
-          uDist: { value: dist },
-          uIds: { value: ids },
-          uOpacity: { value: 0 },
-          uSeam: { value: 0 },
-          uSweep: { value: 0 },
-          uTime: { value: 0 },
-        },
-      }),
-    );
-    this.sculpt.renderOrder = 1;
-    this.group.add(this.sculpt);
-
     // Fragmentos
     const n = this.data.count;
     const boxes = new Array(64).fill(0).map(() => new THREE.Vector4());
@@ -277,6 +232,8 @@ export class Stage {
         uColor: { value: color },
         uIds: { value: ids },
         uDist: { value: dist },
+        uSealed: { value: this.sealed },
+        uSweep: { value: 0 },
       },
     });
     this.mesh = new THREE.InstancedMesh(geo, mat, n);
@@ -286,24 +243,27 @@ export class Stage {
     this.group.add(this.mesh);
 
     const rnd = mulberry(1307);
+    const seqOf = new Map(this.data.order.map((id, k) => [id, k]));
     this.shards = this.data.shards.map((def) => {
       const r6 = () => [0, 0, 0, 0, 0, 0].map(() => rnd()) as Shard['f'];
       const f = r6().map((x) => 0.16 + x * 0.22) as Shard['f'];
       const ph = r6().map((x) => x * Math.PI * 2) as Shard['ph'];
       const axis = new THREE.Vector3(rnd() - 0.5, rnd() - 0.5, (rnd() - 0.5) * 0.6).normalize();
+      const seq = seqOf.get(def.id)!;
       return {
         def,
+        seq,
+        win: SCRIPT.windows[seq],
         home: new THREE.Vector3(),
         start: new THREE.Vector3(),
-        ctrl: new THREE.Vector3(),
+        c1: new THREE.Vector3(),
+        c2: new THREE.Vector3(),
+        settle: (rnd() < 0.5 ? -1 : 1) * (0.03 + rnd() * 0.025),
         qStart: new THREE.Quaternion(),
         spinAxis: axis,
         spin: (rnd() < 0.5 ? -1 : 1) * (0.3 + rnd() * 0.6),
         scaleStart: 1,
         bend: 0.18 + rnd() * 0.22,
-        // De abajo arriba, como se levanta una pieza en el taller: la base
-        // primero y la corona al final, con algo de azar para que respire.
-        delay: SCRIPT.maxDelay * clamp01(def.c[1] * 0.78 + rnd() * 0.22),
         depth: 0.5,
         f,
         ph,
@@ -328,12 +288,8 @@ export class Stage {
     this.sculptH = portrait ? Math.min(h0 * 0.66, (w0 * 0.86) / sa) : h0 * 0.8;
     this.sculptW = this.sculptH * sa;
     this.mesh.material.uniforms.uSculpt.value.set(this.sculptW, this.sculptH);
-    this.sculpt.scale.set(this.sculptW, this.sculptH, 1);
-    this.sculpt.position.z = -0.004;
 
     const rnd = mulberry(4242);
-    // Orden por tamano: los grandes ocupan los huecos de protagonista.
-    const bySize = [...this.shards].sort((a, b) => b.def.a - a.def.a);
 
     // Huecos prediseñados a partir de la portada (x, y en -1..1 de pantalla,
     // z profundidad). Los primeros son los grandes: el cuenco de la izquierda,
@@ -355,10 +311,41 @@ export class Stage {
     ];
     const slots = portrait ? tall : wide;
 
-    bySize.forEach((sh, i) => {
+    // Reparto de huecos. Un fragmento que espera delante de la escultura la
+    // taparia mientras se construye: esos huecos son para los primeros del
+    // montaje, que se marchan enseguida. El resto, por tamano, como en la
+    // portada: los grandes en los huecos de protagonista.
+    const colX = (this.sculptW / w0) * 1.05 + 0.04;
+    const colY = (this.sculptH / h0) * 1.05;
+    const inFront = ([sx, sy, z]: [number, number, number]) => z > -0.3 && Math.abs(sx) < colX && Math.abs(sy) < colY;
+    const bySeq = [...this.shards].sort((a, b) => a.seq - b.seq);
+    const bySize = [...this.shards].sort((a, b) => b.def.a - a.def.a);
+    const used = new Set<Shard>();
+    const assign = new Map<Shard, [number, number, number] | null>();
+    slots.forEach((slot) => {
+      if (!inFront(slot)) return;
+      const sh = bySeq.find((x) => !used.has(x))!;
+      used.add(sh);
+      assign.set(sh, slot);
+    });
+    slots.forEach((slot) => {
+      if (inFront(slot)) return;
+      const sh = bySize.find((x) => !used.has(x))!;
+      used.add(sh);
+      assign.set(sh, slot);
+    });
+    bySize.forEach((sh) => !used.has(sh) && assign.set(sh, null));
+    // La ultima pieza, la del rostro, espera a la vista toda la construcción,
+    // algo mas grande y cerca: el que mira sabe que falta ella.
+    const last = bySeq[bySeq.length - 1];
+    if (!assign.get(last)) assign.set(last, portrait ? [0.52, -0.8, 1.1] : [0.56, 0.64, 1.1]);
+
+    let rank = 0;
+    bySize.forEach((sh) => {
+      const slot = assign.get(sh)!;
       let sx: number, sy: number, z: number;
-      if (i < slots.length) {
-        [sx, sy, z] = slots[i];
+      if (slot) {
+        [sx, sy, z] = slot;
         sx += (rnd() - 0.5) * 0.06;
         sy += (rnd() - 0.5) * 0.06;
       } else {
@@ -380,23 +367,37 @@ export class Stage {
       sh.depth = clamp01((z + 5.5) / 9);
       // Los grandes de primer plano se ven mas grandes por perspectiva; al
       // resto se les da algo de cuerpo para que se lean como en la portada.
-      const big = i < 2 ? 1.3 : 1.0;
+      const big = rank++ < 2 || sh === last ? 1.3 : 1.0;
       sh.scaleStart = (portrait ? 0.78 : 1.12) * big * (0.9 + rnd() * 0.25);
 
       // Casa
       const [bx, by, bw, bh] = sh.def.box;
       sh.home.set((bx + bw / 2 - 0.5) * this.sculptW, (by + bh / 2 - 0.5) * this.sculptH, 0);
 
-      // Control de la curva: el camino no es recto, gira alrededor de la
-      // escultura y se acerca a camara antes de encajar.
-      const d = this.tmpV.subVectors(sh.start, sh.home);
-      const ang = (rnd() < 0.5 ? -1 : 1) * (0.5 + rnd() * 0.5);
-      const c = Math.cos(ang);
-      const s = Math.sin(ang);
-      sh.ctrl.set(
-        sh.home.x + (d.x * c - d.y * s) * 0.5,
-        sh.home.y + (d.x * s + d.y * c) * 0.5,
-        sh.home.z + d.z * 0.35 + 1.2 + rnd() * 1.4,
+      // Trayectoria: curva de Bezier cubica.
+      //  - c1: el fragmento se despega de donde flotaba, sube un poco y se
+      //    acerca a camara, como si algo tirase de el.
+      //  - c2: llega desde fuera de la escultura y por delante, con un arco
+      //    lateral; el ultimo tramo es un acercamiento frontal hasta posarse.
+      const d = this.tmpV.subVectors(sh.home, sh.start);
+      const len = d.length();
+      const side = rnd() < 0.5 ? -1 : 1;
+      const perpX = (-d.y / (Math.hypot(d.x, d.y) || 1)) * side;
+      const perpY = (d.x / (Math.hypot(d.x, d.y) || 1)) * side;
+      sh.c1.set(
+        sh.start.x + d.x * 0.12 + perpX * len * 0.18,
+        sh.start.y + d.y * 0.12 + perpY * len * 0.18 + this.sculptH * 0.06,
+        // Los que esperan al fondo se adelantan pronto: nunca viajan ocultos
+        // detras de la parte ya construida.
+        Math.max(sh.start.z + 0.8, 0.6) + rnd() * 0.6,
+      );
+      const outX = sh.home.x;
+      const outY = sh.home.y;
+      const outL = Math.hypot(outX, outY) || 1;
+      sh.c2.set(
+        sh.home.x + (outX / outL) * this.sculptH * 0.16 + perpX * len * 0.08,
+        sh.home.y + (outY / outL) * this.sculptH * 0.16 + perpY * len * 0.08,
+        sh.home.z + 1.1 + rnd() * 0.5,
       );
 
       // Orientacion inicial: bien inclinados, para que se lea el volumen de
@@ -494,19 +495,15 @@ export class Stage {
 
     const s = this.s;
     const t = this.time;
-    const A = clamp01((s - SCRIPT.assembleStart) / (SCRIPT.assembleEnd - SCRIPT.assembleStart));
-    const span = 1 - SCRIPT.maxDelay;
+    const build = clamp01((s - SCRIPT.buildStart) / (SCRIPT.buildEnd - SCRIPT.buildStart));
 
-    // Juntas de oro: se encienden al encajar, brillan un instante y se van.
-    const seam =
-      A < 1 ? 0.7 : 0.7 + 0.3 * smooth(SCRIPT.assembleEnd, SCRIPT.seamPeak, s) - smooth(SCRIPT.seamPeak, SCRIPT.seamEnd, s);
-    const seamNow = Math.max(0, seam);
-
-    // Camara: un balanceo minimo con el puntero y un paso adelante al final.
+    // Camara: un balanceo minimo con el puntero y, mientras se construye, una
+    // deriva muy lenta que da paralaje entre la escultura y lo que aun flota.
     const aspect = this.w / this.h;
     const portrait = aspect < 0.9;
-    this.camera.position.x = this.mouse.x * 0.22;
-    this.camera.position.y = this.mouse.y * 0.14;
+    const drift = Math.sin(build * Math.PI);
+    this.camera.position.x = this.mouse.x * 0.22 + drift * 0.18;
+    this.camera.position.y = this.mouse.y * 0.14 + drift * 0.06;
     this.camera.lookAt(0, 0, 0);
 
     // Grupo: la escultura se aparta para dejar sitio al texto.
@@ -528,31 +525,36 @@ export class Stage {
     this.group.updateMatrixWorld();
 
     let landed = 0;
-    let allSealed = true;
     const introE = easeOut(this.intro);
 
     for (const sh of this.shards) {
-      const u = reduced ? (A > 0.5 ? 1 : 0) : clamp01((A - sh.delay) / span);
+      // Cada fragmento tiene su propia ventana de scroll: fuera de ella esta
+      // flotando (antes) o en su sitio (despues).
+      const u = clamp01((s - sh.win[0]) / (sh.win[1] - sh.win[0]));
       sh.u = u;
-      const e = easeInOut(u);
-      const er = easeOut(clamp01(u * 1.08)); // la rotacion asienta un poco antes
-      if (u >= 0.985) landed++;
-      const seal = smooth(0.94, 1.0, u);
-      if (seal < 1) allSealed = false;
+      if (u >= 1) landed++;
+      this.sealed[sh.def.id - 1] = u >= 1 ? 1 : 0;
 
-      // Curva de Bezier cuadratica: salida -> control -> casa.
-      const a = (1 - e) * (1 - e);
-      const b = 2 * e * (1 - e);
-      const c = e * e;
+      // Con movimiento reducido no hay viaje: la pieza se desvanece donde
+      // flotaba y aparece en su sitio, en su turno.
+      const e = reduced ? (u < 0.5 ? 0 : 1) : easeTravel(u);
+      const er = reduced ? e : easeOut(clamp01(u * 1.15)); // encara la escultura antes de llegar
+
+      // Bezier cubica: salida -> despegue -> aproximacion -> casa.
+      const i1 = 1 - e;
+      const b0 = i1 * i1 * i1;
+      const b1 = 3 * i1 * i1 * e;
+      const b2 = 3 * i1 * e * e;
+      const b3 = e * e * e;
       const p = this.tmpV.set(
-        a * sh.start.x + b * sh.ctrl.x + c * sh.home.x,
-        a * sh.start.y + b * sh.ctrl.y + c * sh.home.y,
-        a * sh.start.z + b * sh.ctrl.z + c * sh.home.z,
+        b0 * sh.start.x + b1 * sh.c1.x + b2 * sh.c2.x + b3 * sh.home.x,
+        b0 * sh.start.y + b1 * sh.c1.y + b2 * sh.c2.y + b3 * sh.home.y,
+        b0 * sh.start.z + b1 * sh.c1.z + b2 * sh.c2.z + b3 * sh.home.z,
       );
 
       // Flotacion: suma de senos lentos de frecuencias distintas por eje. Se
       // apaga en cuanto el fragmento emprende el viaje.
-      const fl = (1 - smooth(0, 0.55, u)) * (reduced ? 0 : 1);
+      const fl = (1 - smooth(0, 0.3, u)) * (reduced ? 0 : 1);
       const amp = 0.07 * sh.amp * fl * (0.6 + sh.depth);
       p.x += (Math.sin(t * sh.f[0] + sh.ph[0]) + 0.45 * Math.sin(t * sh.f[3] * 1.7 + sh.ph[3])) * amp * 0.7;
       p.y += (Math.sin(t * sh.f[1] + sh.ph[1]) + 0.4 * Math.sin(t * sh.f[4] * 1.9 + sh.ph[4])) * amp;
@@ -575,7 +577,16 @@ export class Stage {
       this.tmpQ2.setFromAxisAngle(sh.spinAxis, sh.spin * (1 - er) * (1 - er) + Math.sin(t * sh.f[5] + sh.ph[5]) * 0.12 * fl);
       this.tmpQ.multiply(this.tmpQ2);
 
-      const sc = sh.scaleStart + (1 - sh.scaleStart) * e;
+      // Asiento: en el ultimo tramo la pieza hace una correccion minima de
+      // giro y de escala, como cuando se encaja a mano, y queda exacta.
+      let sc = sh.scaleStart + (1 - sh.scaleStart) * e;
+      if (!reduced && u > 0.78 && u < 1) {
+        const q = (u - 0.78) / 0.22;
+        const damp = Math.pow(1 - q, 1.6);
+        this.tmpQ2.setFromAxisAngle(this.zAxis, sh.settle * Math.sin(q * Math.PI * 2) * damp);
+        this.tmpQ.premultiply(this.tmpQ2);
+        sc *= 1 + 0.018 * Math.sin(q * Math.PI) * damp;
+      }
       this.tmpS.set(sc, sc, sc);
       // La matriz se guarda en el fragmento; el orden de dibujo va despues.
       sh.m.compose(p, this.tmpQ, this.tmpS);
@@ -588,43 +599,39 @@ export class Stage {
     const ids = this.aShard.array as Float32Array;
     const alpha = this.aAlpha.array as Float32Array;
     const focus = 0.5;
+    const introA = (sh: Shard) => clamp01(this.intro * 1.6 - (1 - sh.depth) * 0.4);
     for (let k = 0; k < this.order.length; k++) {
       const sh = this.shards[this.order[k]];
       const u = sh.u;
-      const e = easeInOut(u);
+      const e = reduced ? (u < 0.5 ? 0 : 1) : easeTravel(u);
       this.mesh.setMatrixAt(k, sh.m);
       ids[k] = sh.def.id;
       const zDist = Math.abs(sh.z - focus);
       const blur = Math.min(1, Math.pow(Math.max(0, zDist - 0.9) / 3.6, 1.3)) * (1 - e);
-      dyn[k * 4 + 0] = sh.bend * (1 - smooth(0.25, 0.95, u));
-      dyn[k * 4 + 1] = 1 + (seamNow - 1) * smooth(0.75, 1, u);
+      dyn[k * 4 + 0] = sh.bend * (1 - smooth(0.3, 0.9, u));
+      // El filo de oro acompana el viaje y se apaga al posarse: la pieza queda
+      // integrada, sin junta.
+      dyn[k * 4 + 1] = 1 - smooth(0.86, 1.0, u);
       dyn[k * 4 + 2] = blur;
       dyn[k * 4 + 3] = smooth(0.94, 1.0, u);
-      alpha[k] = clamp01(this.intro * 1.6 - (1 - sh.depth) * 0.4) * (reduced ? 1 - smooth(0.4, 0.6, A) : 1);
+      alpha[k] = introA(sh) * (reduced ? Math.abs(Math.cos(Math.PI * u)) : 1);
     }
     this.mesh.instanceMatrix.needsUpdate = true;
     this.aDyn.needsUpdate = true;
     this.aShard.needsUpdate = true;
     this.aAlpha.needsUpdate = true;
 
-    // Relevo: con todo sellado, la escultura entera sustituye a los
-    // fragmentos, que son la misma imagen pixel a pixel.
-    const whole = reduced ? smooth(0.4, 0.6, A) : allSealed ? 1 : 0;
-    this.mesh.visible = whole < 1;
-    const su = this.sculpt.material.uniforms;
-    su.uOpacity.value = whole;
-    su.uSeam.value = seamNow;
-    su.uTime.value = t;
+    // Un barrido de luz cruza la porcelana cuando ya esta entera y quieta.
     const sw = clamp01((s - SCRIPT.sweep[0]) / (SCRIPT.sweep[1] - SCRIPT.sweep[0]));
-    su.uSweep.value = reduced ? 0 : sw;
+    this.mesh.material.uniforms.uSweep.value = reduced ? 0 : sw;
 
     // Fondo
     const bu = this.silk.material.uniforms;
     bu.uTime.value = reduced ? 0 : t;
     bu.uMouse.value.copy(this.mouse);
-    bu.uCalm.value = 0.18 * smooth(0.3, 0.55, s) + 0.5 * smooth(0.86, 1.0, s);
+    bu.uCalm.value = 0.18 * smooth(SCRIPT.buildStart, SCRIPT.buildEnd, s) + 0.5 * smooth(SCRIPT.pieceB[1], 1.0, s);
     const gp = this.group.position;
-    bu.uFocus.value.set(gp.x / ((this.h0 * aspect) / 2), gp.y / (this.h0 / 2), 0.9 * smooth(0.2, 0.5, s));
+    bu.uFocus.value.set(gp.x / ((this.h0 * aspect) / 2), gp.y / (this.h0 / 2), 0.9 * smooth(SCRIPT.buildStart, SCRIPT.buildEnd * 0.6, s));
 
     this.renderer.render(this.scene, this.camera);
 

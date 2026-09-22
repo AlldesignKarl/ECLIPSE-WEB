@@ -23,26 +23,37 @@ trozos de la escultura. `scripts/build-shards.py` recorta el busto (sin fondo)
 y lo parte en 38 fragmentos con grietas irregulares; `shards.png` guarda en
 cada píxel a qué fragmento pertenece y a qué distancia está del borde. En
 WebGL cada fragmento es una instancia que descarta todo lo que no es suyo, se
-curva como una concha, lleva filo de oro y flota. El scroll lo lleva por una
-curva hasta su sitio; como cada píxel pertenece a un solo fragmento, al
-encajar la escultura queda sin costuras. Al final las juntas brillan en oro
-(kintsugi) y se desvanecen.
+curva como una concha, lleva filo de oro y flota.
+
+**La escultura se construye pieza a pieza.** Cada fragmento tiene su propia
+ventana de scroll (`src/alldesign/script.ts`): despega, describe un arco y se
+posa con una pequeña corrección final; la siguiente sale cuando la anterior va
+por algo más de la mitad, así que nunca hay más de dos en movimiento. El orden
+lo decide `scripts/order-shards.py`: empieza por una pieza grande del pecho,
+cada pieza siguiente toca a alguna ya colocada, primero las grandes y las de
+abajo, y la última es la del rostro, que espera a la vista toda la
+construcción. No hay ninguna capa con la escultura entera: lo que se ve al
+final son los 38 fragmentos en su sitio. El contador (`00 / 38 fragmentos`)
+cuenta los que ya han llegado, y al subir se deshace en orden inverso.
 
 | Archivo | Qué hace |
 | --- | --- |
-| `src/alldesign/stage.ts` | El escenario y **el guion** (`SCRIPT`): cuándo empieza y acaba el ensamblaje, el oro, el barrido de luz y los textos. Todo es función pura del progreso: se puede subir y bajar. |
+| `src/alldesign/script.ts` | **El guion**, en vh de recorrido: la ventana de cada fragmento, la pausa con la escultura completa y los textos. |
+| `src/alldesign/stage.ts` | El escenario: flotación, trayectorias y asiento de cada fragmento. Todo es función pura del progreso: se puede subir y bajar. |
 | `src/alldesign/shaders.ts` | Seda de fondo, fragmentos y escultura entera. |
 | `src/alldesign/main.ts` | Lenis + GSAP ScrollTrigger: progreso del escenario, capa de textos, colecciones, artesanía en horizontal, paneles, cursor. |
 | `scripts/build-shards.py` | Recorte, fragmentación y datos de los fragmentos. Necesita `pillow`, `numpy`, `scipy` y la máscara de `rembg` (modelo `isnet-general-use`). |
+| `scripts/order-shards.py` | Orden de montaje de los fragmentos. |
 | `scripts/build-editorial.py` | Fotografías provisionales de colecciones y taller, sacadas de las referencias. |
 
 Herramientas: `?s=0.5` congela la pieza en ese punto del guion (0 portada,
-0.47 escultura completa, 1 final); `?bg` muestra solo la seda; en consola,
-`__ak()` da el estado del escenario.
+0.67 escultura completa, 1 final); `?bg` muestra solo la seda; en consola,
+`__ak()` da el estado del escenario y cuántos fragmentos han llegado.
 
 Móvil: misma idea con la textura a media resolución, sin paralaje de puntero y
 con los textos bajo la escultura. Sin WebGL se sirve la escultura como imagen
-fija; con `prefers-reduced-motion` los fragmentos no vuelan, se funden.
+fija; con `prefers-reduced-motion` los fragmentos no vuelan: cada uno se
+desvanece donde flotaba y aparece en su sitio, en su turno.
 
 Pendiente de datos reales: fotografía de producto de las colecciones (las
 actuales salen de las dos imágenes de referencia), correo de contacto

@@ -6,7 +6,9 @@ Entrada:  una foto de la escultura y su mascara alfa (recorte hecho con rembg,
 Salida en public/alldesign-karl/:
   sculpture.webp   la escultura sin fondo, con los bordes descontaminados del gris
   shards.png       R = id del fragmento, G = distancia al borde del fragmento
-  shards.json      caja y centroide de cada fragmento en coordenadas de textura
+Y en src/alldesign/shards.json la caja y el centroide de cada fragmento en
+coordenadas de textura (va dentro del bundle). Despues hay que ejecutar
+scripts/order-shards.py, que decide el orden de montaje.
 
 La particion es un Voronoi deformado con ruido: las lineas de rotura quedan
 irregulares, como porcelana rota de verdad, y cada pixel pertenece a un unico
@@ -190,7 +192,7 @@ for k in range(1, N + 1):
         "a": round(float(area), 5),
     })
 
-json.dump({"w": TW, "h": TH, "count": N, "shards": shards}, open(f"{OUT}/shards.json", "w"))
+json.dump({"w": TW, "h": TH, "count": N, "shards": shards}, open("src/alldesign/shards.json", "w"))
 
 # Vista de control
 pal = rng.uniform(0.3, 1, (N + 1, 3)); pal[0] = 0

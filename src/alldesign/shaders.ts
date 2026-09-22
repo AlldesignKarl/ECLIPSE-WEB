@@ -157,6 +157,8 @@ export const shardFragment = /* glsl */ `
   uniform sampler2D uColor;
   uniform sampler2D uIds;
   uniform sampler2D uDist;
+  uniform float uSealed[64];
+  uniform float uSweep;
   varying vec2 vUv;
   varying vec3 vN;
   varying vec3 vV;
@@ -166,14 +168,22 @@ export const shardFragment = /* glsl */ `
 
   void main() {
     if (vUv.x < 0.0 || vUv.y < 0.0 || vUv.x > 1.0 || vUv.y > 1.0) discard;
-    float id = floor(texture2D(uIds, vUv).r * 255.0 + 0.5);
-    if (abs(id - vId) > 0.5) discard;
-
     float blur = vDyn.z;
     float seal = vDyn.w;
     float lit = 1.0 - seal;
+
+    float id = floor(texture2D(uIds, vUv).r * 255.0 + 0.5);
+    bool mine = abs(id - vId) < 0.5;
+    // Junta entre dos piezas ya posadas: el texel de la frontera puede caer
+    // fuera de las dos cajas por redondeo y dejar un pixel de fondo. Si las dos
+    // estan en su sitio, cualquiera puede pintarlo: es la misma porcelana en el
+    // mismo lugar. Con piezas en vuelo no aplica: su hueco debe verse.
+    bool shared = !mine && seal > 0.999 && id > 0.5 && uSealed[int(id + 0.5) - 1] > 0.5;
+    if (!mine && !shared) discard;
+
     float dist = texture2D(uDist, vUv).g * 255.0 / 4.0;   // en pixeles de textura
     vec4 tex = texture2D(uColor, vUv, blur * 3.2);
+    if (shared && tex.a < 0.99) discard;
 
     vec3 N = gl_FrontFacing ? vN : -vN;
     vec3 base = tex.rgb;
@@ -211,53 +221,14 @@ export const shardFragment = /* glsl */ `
     float edge = mix(smoothstep(0.0, soft, dist), 1.0, seal);
     float a = tex.a * edge * vAlpha;
     if (a < 0.003) discard;
-    gl_FragColor = vec4(col, a);
-  }
-`;
 
-// ---------------------------------------------------------------------------
-// Escultura entera: la que queda cuando todos los fragmentos han encajado.
-// Dibuja las juntas en oro (kintsugi) y el barrido de luz del final.
-// ---------------------------------------------------------------------------
-export const sculptVertex = /* glsl */ `
-  varying vec2 vUv;
-  void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-export const sculptFragment = /* glsl */ `
-  precision highp float;
-  uniform sampler2D uColor;
-  uniform sampler2D uDist;
-  uniform sampler2D uIds;
-  uniform float uOpacity;
-  uniform float uSeam;
-  uniform float uSweep;
-  uniform float uTime;
-  varying vec2 vUv;
-
-  void main() {
-    vec4 tex = texture2D(uColor, vUv);
-    if (tex.a < 0.003) discard;
-    vec3 col = tex.rgb;
-
-    float dist = texture2D(uDist, vUv).g * 255.0 / 4.0;
-    float inner = smoothstep(0.92, 0.995, texture2D(uColor, vUv, 3.0).a);
-    float seam = (1.0 - smoothstep(1.2, 2.2, dist)) * inner * uSeam;
-    // El oro recorre la junta: un brillo lento que avanza por las grietas.
-    float run = 0.75 + 0.25 * sin(vUv.y * 40.0 - uTime * 1.5 + vUv.x * 12.0);
-    vec3 gold = mix(vec3(0.62, 0.44, 0.18), vec3(1.0, 0.87, 0.55), run);
-    col = mix(col, gold, seam);
-
-    // Barrido de luz: una banda diagonal que cruza la pieza una sola vez.
+    // Barrido de luz sobre la escultura ya completa: una banda diagonal que
+    // cruza la porcelana una sola vez.
     float d = (vUv.x * 0.55 + vUv.y) - (uSweep * 2.2 - 0.4);
     float band = exp(-d * d / 0.006) * step(0.001, uSweep) * (1.0 - step(0.999, uSweep));
     float lum = dot(tex.rgb, vec3(0.299, 0.587, 0.114));
-    col += vec3(1.0, 0.97, 0.9) * band * 0.28 * smoothstep(0.35, 0.95, lum);
-    col = mix(col, vec3(1.0, 0.9, 0.62), band * seam * 0.6);
+    col += vec3(1.0, 0.97, 0.9) * band * 0.22 * smoothstep(0.35, 0.95, lum) * seal;
 
-    gl_FragColor = vec4(col, tex.a * uOpacity);
+    gl_FragColor = vec4(col, a);
   }
 `;

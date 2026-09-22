@@ -2,7 +2,8 @@ import './style.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import { SCRIPT, Stage, type StageFrame } from './stage';
+import { SCRIPT } from './script';
+import { Stage, type StageFrame } from './stage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -57,6 +58,9 @@ $$<HTMLAnchorElement>('a[href^="#"]').forEach((a) =>
 // Escenario WebGL
 // ---------------------------------------------------------------------------
 const stageEl = $('.stage');
+// La seccion mide lo que dura el guion mas una pantalla: el escenario queda
+// fijo mientras tanto.
+$('.experience').style.height = `${SCRIPT.totalVh + 100}vh`;
 const canvas = $<HTMLCanvasElement>('.stage__canvas');
 const counterN = $('[data-assembly-n]');
 const notes = $$('[data-note]');
@@ -157,30 +161,35 @@ function buildStageTimeline() {
   });
   const heroItems = $$('[data-hero-item]');
   const corners = $$('[data-hero-corner]');
-  tl.to(heroItems, { autoAlpha: 0, y: -36, filter: 'blur(8px)', stagger: 0.004, duration: 0.05, ease: 'power1.in' }, 0.004)
-    .to(corners, { autoAlpha: 0, y: 12, duration: 0.03 }, 0.004)
-    .fromTo('[data-assembly]', { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.03 }, 0.06)
-    .to('[data-assembly]', { autoAlpha: 0, y: -10, duration: 0.03 }, SCRIPT.assembleEnd + 0.03);
+  const v = SCRIPT.f; // vh de recorrido -> fraccion del escenario
+  const [h0, h1] = SCRIPT.heroOut;
+  const [a0] = SCRIPT.pieceA;
+  const [b0, b1] = SCRIPT.pieceB;
+  tl.to(heroItems, { autoAlpha: 0, y: -36, filter: 'blur(8px)', stagger: v(2.8), duration: h1 - h0, ease: 'power1.in' }, h0)
+    .to(corners, { autoAlpha: 0, y: 12, duration: v(21) }, h0)
+    // El contador ocupa el sitio de "Hecho a mano en Aragon" desde el primer
+    // gesto y se queda hasta que la escultura cede el paso al texto.
+    .fromTo('[data-assembly]', { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: v(18) }, h0 + v(8))
+    .to('[data-assembly]', { autoAlpha: 0, y: -10, duration: v(21) }, a0 - v(6));
 
   const aLines = $$('[data-line]', $('[data-piece="a"]'));
   const bLines = $$('[data-line]', $('[data-piece="b"]'));
-  const [a0] = SCRIPT.pieceA;
-  const [b0, b1] = SCRIPT.pieceB;
+  const lineIn = { autoAlpha: 1, y: 0, filter: 'blur(0px)', stagger: v(8.4), duration: v(35), ease: 'power2.out' };
   tl.set('[data-piece="a"]', { autoAlpha: 1 }, a0)
-    .fromTo(aLines, { autoAlpha: 0, y: 26, filter: 'blur(10px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', stagger: 0.012, duration: 0.05, ease: 'power2.out' }, a0 + 0.02)
-    .to(aLines, { autoAlpha: 0, y: -22, filter: 'blur(6px)', stagger: 0.006, duration: 0.03, ease: 'power1.in' }, b0 - 0.035)
+    .fromTo(aLines, { autoAlpha: 0, y: 26, filter: 'blur(10px)' }, lineIn, a0 + v(14))
+    .to(aLines, { autoAlpha: 0, y: -22, filter: 'blur(6px)', stagger: v(4.2), duration: v(21), ease: 'power1.in' }, b0 - v(24.5))
     .set('[data-piece="b"]', { autoAlpha: 1 }, b0)
-    .fromTo(bLines, { autoAlpha: 0, y: 26, filter: 'blur(10px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', stagger: 0.012, duration: 0.05, ease: 'power2.out' }, b0 + 0.02)
-    .fromTo('[data-note]', { autoAlpha: 0, x: 18 }, { autoAlpha: 1, x: 0, stagger: 0.012, duration: 0.04 }, b1 - 0.02)
-    .fromTo(noteLines, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.04 }, b1 - 0.01)
+    .fromTo(bLines, { autoAlpha: 0, y: 26, filter: 'blur(10px)' }, lineIn, b0 + v(14))
+    .fromTo('[data-note]', { autoAlpha: 0, x: 18 }, { autoAlpha: 1, x: 0, stagger: v(8.4), duration: v(28) }, b1 - v(14))
+    .fromTo(noteLines, { autoAlpha: 0 }, { autoAlpha: 1, duration: v(28) }, b1 - v(7))
     .set({}, {}, 1);
 
   // Sin WebGL: la escultura es una imagen fija que acompaña a los textos.
   if (document.documentElement.classList.contains('no-webgl')) {
     const wide = desktop.matches;
-    tl.fromTo('.stage__poster', { autoAlpha: 0.14, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'power1.inOut' }, 0.05)
-      .to('.stage__poster', { xPercent: wide ? -62 : 0, yPercent: wide ? 0 : -22, scale: wide ? 1 : 0.7, duration: 0.08 }, a0)
-      .to('.stage__poster', { xPercent: wide ? 45 : 0, duration: 0.08 }, b0);
+    tl.fromTo('.stage__poster', { autoAlpha: 0.14, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: SCRIPT.buildEnd - h1, ease: 'power1.inOut' }, h1)
+      .to('.stage__poster', { xPercent: wide ? -62 : 0, yPercent: wide ? 0 : -22, scale: wide ? 1 : 0.7, duration: v(56) }, a0)
+      .to('.stage__poster', { xPercent: wide ? 45 : 0, duration: v(56) }, b0);
   }
   if (frozen) tl.progress(parseFloat(params.get('s')!) || 0);
 }

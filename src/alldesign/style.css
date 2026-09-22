@@ -304,7 +304,8 @@ button {
 
 .experience {
   position: relative;
-  height: 800vh;
+  /* La altura real la pone main.ts a partir del guion (script.ts). */
+  height: 1100vh;
 }
 
 .stage {
@@ -549,6 +550,10 @@ button {
 
 /* Contador de fragmentos */
 .assembly {
+  /* Halo marfil: los fragmentos que flotan detras no le quitan lectura. */
+  text-shadow:
+    0 0 14px var(--ivory),
+    0 0 28px var(--ivory);
   position: absolute;
   left: var(--gutter);
   bottom: clamp(32px, 7vh, 76px);
@@ -1340,9 +1345,6 @@ button {
 }
 
 @media (max-width: 899px) {
-  .experience {
-    height: 640vh;
-  }
   .hero__kicker {
     gap: 0.9em;
     letter-spacing: 0.3em;
