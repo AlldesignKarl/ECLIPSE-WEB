@@ -22,6 +22,10 @@ import {
   type QuotePayload,
 } from '../src/alldesign/quote-config';
 
+// Variables de entorno de Vercel. Se declara aqui para no depender de los
+// tipos de Node al compilar la funcion.
+declare const process: { env: Record<string, string | undefined> };
+
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json; charset=utf-8' } });
 
@@ -52,7 +56,7 @@ function checkFiles(list: unknown): { files: QuoteFile[]; error?: string } {
   for (const f of list) {
     const data = String(f?.data ?? '');
     if (!/^[A-Za-z0-9+/]+={0,2}$/.test(data)) return { files: [], error: 'Un archivo adjunto está dañado.' };
-    const bytes = Uint8Array.from(Buffer.from(data, 'base64'));
+    const bytes = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
     total += bytes.length;
     const type = sniff(bytes);
     if (!type || !FILES.types.includes(type)) return { files: [], error: 'Solo se admiten archivos JPG, PNG, WEBP o PDF.' };
