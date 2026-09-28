@@ -65,8 +65,6 @@ const stageEl = $('.stage');
 $('.experience').style.height = `${SCRIPT.totalVh + 100}vh`;
 const canvas = $<HTMLCanvasElement>('.stage__canvas');
 const counterN = $('[data-assembly-n]');
-const notes = $$('[data-note]');
-const noteLines = $<SVGSVGElement>('[data-note-lines]');
 let stage: Stage | null = null;
 let stageInView = true;
 
@@ -84,27 +82,6 @@ function onFrame(f: StageFrame) {
   if (f.landed !== lastLanded) {
     lastLanded = f.landed;
     counterN.textContent = String(f.landed).padStart(2, '0');
-  }
-  // Anotaciones: el punto de cada nota sigue a la escultura.
-  if (f.s > SCRIPT.pieceB[0] && desktop.matches) {
-    const box = stageEl.getBoundingClientRect();
-    let d = '';
-    for (const n of notes) {
-      const [u, v] = n.dataset.note!.split(',').map(Number);
-      const p = f.project(u, v);
-      const r = n.getBoundingClientRect();
-      const x0 = r.left - box.left - 14;
-      const y0 = r.top - box.top + r.height / 2;
-      d += `M${x0.toFixed(1)} ${y0.toFixed(1)}L${(p.x + 6).toFixed(1)} ${p.y.toFixed(1)}`;
-      n.style.setProperty('--py', `${p.y}px`);
-    }
-    noteLines.innerHTML = `<path d="${d}" pathLength="1" /><g>${notes
-      .map((n) => {
-        const [u, v] = n.dataset.note!.split(',').map(Number);
-        const p = f.project(u, v);
-        return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" />`;
-      })
-      .join('')}</g>`;
   }
 }
 
@@ -166,7 +143,7 @@ function buildStageTimeline() {
   const v = SCRIPT.f; // vh de recorrido -> fraccion del escenario
   const [h0, h1] = SCRIPT.heroOut;
   const [a0] = SCRIPT.pieceA;
-  const [b0, b1] = SCRIPT.pieceB;
+  const [b0] = SCRIPT.pieceB;
   tl.to(heroItems, { autoAlpha: 0, y: -36, filter: 'blur(8px)', stagger: v(2.8), duration: h1 - h0, ease: 'power1.in' }, h0)
     .to(corners, { autoAlpha: 0, y: 12, duration: v(21) }, h0)
     // El contador ocupa el sitio de "Hecho a mano en Aragon" desde el primer
@@ -182,8 +159,6 @@ function buildStageTimeline() {
     .to(aLines, { autoAlpha: 0, y: -22, filter: 'blur(6px)', stagger: v(4.2), duration: v(21), ease: 'power1.in' }, b0 - v(24.5))
     .set('[data-piece="b"]', { autoAlpha: 1 }, b0)
     .fromTo(bLines, { autoAlpha: 0, y: 26, filter: 'blur(10px)' }, lineIn, b0 + v(14))
-    .fromTo('[data-note]', { autoAlpha: 0, x: 18 }, { autoAlpha: 1, x: 0, stagger: v(8.4), duration: v(28) }, b1 - v(14))
-    .fromTo(noteLines, { autoAlpha: 0 }, { autoAlpha: 1, duration: v(28) }, b1 - v(7))
     .set({}, {}, 1);
 
   // Sin WebGL: la escultura es una imagen fija que acompaña a los textos.
@@ -263,6 +238,13 @@ function reveals() {
     tl.fromTo(fig, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'power4.inOut' })
       .from(img, { scale: 1.3, duration: 2.2, ease: 'power3.out' }, 0);
   });
+
+  // El logo de "Sobre nosotros" gira despacio con el scroll, como un sello.
+  gsap.fromTo(
+    '.about__logo',
+    { rotation: -24 },
+    { rotation: 12, ease: 'none', scrollTrigger: { trigger: '.about__logo', start: 'top bottom', end: 'bottom top', scrub: true } },
+  );
 
   // Paralaje interno de las fotografias.
   $$('[data-parallax]').forEach((img) => {
@@ -438,15 +420,13 @@ function nav() {
 }
 
 const CATALOG = [
-  { t: 'Flora — busto de porcelana', c: 'Colección Escultórica', href: '#inicio' },
-  { t: 'Cuenco azul roto con oro', c: 'Ediciones Especiales', href: '#colecciones' },
-  { t: 'Vajilla pintada en cobalto', c: 'Colección Azul', href: '#colecciones' },
-  { t: 'Jarrón de ramas', c: 'Colección Botánica', href: '#colecciones' },
-  { t: 'Platos de huerta aragonesa', c: 'Colección Botánica', href: '#colecciones' },
-  { t: 'Figuras de gran formato', c: 'Colección Escultórica', href: '#colecciones' },
-  { t: 'Encargos personalizados', c: 'Contacto', href: '#contacto' },
-  { t: 'Solicitar presupuesto para empresas', c: 'Presupuesto', href: '/alldesign-karl/presupuesto/' },
-];
+  { t: 'Regalos para empresas', c: 'Clientes, equipos y eventos', href: '#colecciones' },
+  { t: 'Decoración artesanal', c: 'Piezas hechas a mano', href: '#colecciones' },
+  { t: 'Productos artesanales', c: 'Cerámica, cestería y más', href: '#colecciones' },
+  { t: 'Pedidos personalizados', c: 'Con el logo de tu empresa', href: '#colecciones' },
+  { t: 'Pedidos mayoristas / grandes cantidades', c: 'Para empresas', href: '/alldesign-karl/presupuesto/' },
+  { t: 'Solicitar presupuesto', c: 'Presupuesto', href: '/alldesign-karl/presupuesto/' },
+]
 
 function panels() {
   let open: HTMLElement | null = null;

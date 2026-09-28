@@ -1040,3 +1040,16 @@ textarea {
   background: rgba(251, 248, 242, 0.8);
   font-size: 14px;
 }
+
+/* Logotipo */
+.brandmark {
+  display: block;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  filter: drop-shadow(0 4px 12px rgba(23, 21, 18, 0.12));
+  transition: transform 0.8s var(--ease);
+}
+.quote__logo:hover .brandmark {
+  transform: rotate(-8deg) scale(1.05);
+}

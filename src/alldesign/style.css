@@ -1590,3 +1590,61 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ------------------------------------------------------------------ logotipo */
+
+.brandmark {
+  display: block;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  filter: drop-shadow(0 4px 12px rgba(74, 64, 54, 0.14));
+  transition: transform 0.8s var(--ease);
+}
+.nav__logo:hover .brandmark {
+  transform: rotate(-8deg) scale(1.05);
+}
+.nav.is-solid .brandmark {
+  width: 48px;
+  height: 48px;
+}
+.loader__mark {
+  width: 132px;
+  height: 132px;
+  animation: breathe 2.4s ease-in-out infinite;
+}
+@keyframes breathe {
+  50% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 10px 30px rgba(176, 138, 74, 0.35));
+  }
+}
+.about__logo {
+  width: 132px;
+  height: 132px;
+  margin: 38px 0 60px;
+  filter: drop-shadow(0 10px 26px rgba(74, 64, 54, 0.16));
+}
+.footer__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+}
+.footer__mark {
+  width: clamp(72px, 8vw, 120px);
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(247, 243, 236, 0.25);
+}
+.piece__cta {
+  margin-top: 30px;
+}
+@media (max-width: 520px) {
+  .brandmark {
+    width: 48px;
+    height: 48px;
+  }
+  .footer__logo {
+    gap: 16px;
+  }
+}

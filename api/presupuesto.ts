@@ -267,3 +267,32 @@ export async function POST(request: Request): Promise<Response> {
   }
   return json(200, { ok: true });
 }
+
+// Prueba de envio: GET /api/presupuesto?test=<TEST_TOKEN> manda una solicitud
+// de ejemplo por el mismo camino que el formulario. Sin la variable TEST_TOKEN
+// (o con un valor distinto) no hace nada.
+export async function GET(request: Request): Promise<Response> {
+  const token = process.env.TEST_TOKEN;
+  const q = new URL(request.url).searchParams.get('test');
+  if (!token || q !== token) return new Response(null, { status: 405 });
+  const sample = {
+    nombre: 'Prueba de la web',
+    cargo: 'Prueba técnica',
+    email: 'alldesignkarl@gmail.com',
+    telefono: '661 30 79 18',
+    empresa: 'PRUEBA Alldesign Karl',
+    producto: 'Regalos para empresas',
+    cantidad: '10 unidades',
+    tipo: 'Pedido puntual',
+    ciudad: 'Zaragoza',
+    descripcion: 'Esto es una solicitud de prueba enviada desde la web para comprobar que los presupuestos llegan al correo.',
+    privacidad: true,
+  };
+  return POST(
+    new Request(request.url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: new URL(request.url).origin },
+      body: JSON.stringify(sample),
+    }),
+  );
+}

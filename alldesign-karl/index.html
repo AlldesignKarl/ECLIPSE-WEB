@@ -4,18 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#F1EBE1" />
-    <link rel="icon" href="/alldesign-karl/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/alldesign-karl/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/alldesign-karl/favicon-64.png" sizes="64x64" type="image/png" />
+    <link rel="apple-touch-icon" href="/alldesign-karl/apple-touch-icon.png" />
 
-    <title>Alldesign Karl — Porcelana artesanal</title>
+    <title>Alldesign Karl — Artesanía y regalos para empresas</title>
     <meta
       name="description"
-      content="Porcelana hecha a mano en Aragón. Piezas únicas modeladas, pintadas en azul cobalto y horneadas a alta temperatura, una a una."
+      content="Alldesign Karl: productos artesanales, regalos para empresas, decoración y pedidos personalizados. Un proyecto familiar hecho a mano en Aragón."
     />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Alldesign Karl" />
     <meta property="og:locale" content="es_ES" />
-    <meta property="og:title" content="Alldesign Karl — Porcelana artesanal" />
+    <meta property="og:title" content="Alldesign Karl — Artesanía y regalos para empresas" />
     <meta property="og:description" content="La belleza de lo artesanal, en cada detalle. Hecho a mano en Aragón." />
     <meta property="og:image" content="/alldesign-karl/og.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -32,12 +34,12 @@
 
     <!-- Cortina de carga: se levanta cuando las texturas de la escultura estan en GPU. -->
     <div class="loader" aria-hidden="true">
-      <span class="loader__mark">AK</span>
+      <img class="loader__mark" src="/alldesign-karl/logo-256.webp" alt="" width="256" height="256" />
       <span class="loader__line"><span class="loader__fill"></span></span>
     </div>
 
     <header class="nav" data-nav>
-      <a class="nav__logo" href="#inicio" aria-label="Alldesign Karl, inicio">AK</a>
+      <a class="nav__logo" href="#inicio" aria-label="Alldesign Karl, inicio"><img class="brandmark" src="/alldesign-karl/logo-256.webp" alt="" width="256" height="256" /></a>
       <nav class="nav__links" aria-label="Principal">
         <a href="#inicio" class="is-active">Inicio</a>
         <a href="#colecciones">Colecciones</a>
@@ -79,7 +81,7 @@
 
           <div class="hero" data-hero>
             <p class="hero__kicker" data-hero-item>
-              <span>Porcelana</span><i>·</i><span>Arte</span><i>·</i><span>Tradición</span>
+              <span>Artesanía</span><i>·</i><span>Diseño</span><i>·</i><span>Tradición</span>
             </p>
             <h1 class="hero__title" data-hero-item>Alldesign Karl</h1>
             <div class="hero__rule" data-hero-item aria-hidden="true">
@@ -110,34 +112,29 @@
             <h2 class="piece__title" data-line>El arte de crear<br /><em>con las manos</em></h2>
             <p data-line>Cada pieza nace de un proceso lento, preciso y profundamente artesanal.</p>
             <p data-line>
-              Trabajamos la porcelana de forma cuidadosa, respetando los tiempos, las formas y cada
-              pequeño detalle que convierte una pieza en algo único.
+              Trabajamos cada encargo de forma cuidadosa, respetando los tiempos, los materiales y cada
+              pequeño detalle que convierte un regalo en algo único.
             </p>
           </article>
 
           <article class="piece piece--b" data-piece="b">
-            <p class="kicker" data-line>Pieza única · Nº 01</p>
+            <p class="kicker" data-line>Para empresas</p>
             <h2 class="piece__title" data-line>El arte<br /><em>de lo único</em></h2>
             <p data-line>
-              <em>Flora</em> es un busto de porcelana modelado a mano y pintado pincelada a pincelada
-              con azul cobalto. La rama nace en el pecho, sube por el cuello y termina en la corona:
-              ninguna hoja se repite.
+              Creamos regalos y detalles artesanales para empresas: piezas pensadas para vuestros
+              clientes, equipos y eventos, hechas a mano y personalizadas con vuestra identidad.
             </p>
             <dl class="specs" data-line>
-              <div><dt>Material</dt><dd>Porcelana esmaltada</dd></div>
-              <div><dt>Decoración</dt><dd>Cobalto a pincel</dd></div>
-              <div><dt>Cocción</dt><dd>1.280 °C</dd></div>
-              <div><dt>Edición</dt><dd>Pieza única</dd></div>
+              <div><dt>Hacemos</dt><dd>Regalos para empresas</dd></div>
+              <div><dt>También</dt><dd>Decoración artesanal</dd></div>
+              <div><dt>A medida</dt><dd>Pedidos personalizados</dd></div>
+              <div><dt>Volumen</dt><dd>Pedidos mayoristas</dd></div>
             </dl>
+            <a class="btn piece__cta" href="/alldesign-karl/presupuesto/" data-line>
+              <span>Solicitar presupuesto</span>
+              <svg viewBox="0 0 28 12" aria-hidden="true"><path d="M0 6h26M21 1l5 5-5 5" /></svg>
+            </a>
           </article>
-
-          <!-- Anotaciones: sus puntos se proyectan desde la escultura en cada fotograma. -->
-          <svg class="notes__lines" data-note-lines aria-hidden="true"></svg>
-          <ul class="notes" data-notes aria-hidden="true">
-            <li class="note" data-note="0.60,0.93"><b>I</b>Corona modelada pétalo a pétalo</li>
-            <li class="note" data-note="0.60,0.70"><b>II</b>Rostro en esmalte blanco</li>
-            <li class="note" data-note="0.62,0.30"><b>III</b>Rama de cobalto a pincel</li>
-          </ul>
         </div>
       </section>
 
@@ -147,22 +144,22 @@
       <section class="collections" id="colecciones">
         <header class="section-head">
           <p class="kicker" data-reveal>Colecciones</p>
-          <h2 class="display" data-reveal>Cuatro maneras<br /><em>de mirar la porcelana</em></h2>
+          <h2 class="display" data-reveal>Lo que<br /><em>hacemos a mano</em></h2>
           <p class="section-head__text" data-reveal>
-            Series cortas, hechas por encargo o en ediciones mínimas. Ninguna pieza sale del taller
-            igual que la anterior.
+            Productos artesanales, regalos para empresas y decoración, hechos por encargo y en
+            series cortas. Ninguna pieza sale del taller igual que la anterior.
           </p>
         </header>
 
         <div class="collections__grid">
           <a class="collection collection--1" href="#contacto" data-cursor="Ver">
             <figure class="collection__media" data-mask>
-              <img src="/alldesign-karl/col-azul.webp" alt="Fragmento de cuenco de porcelana con flores azules y filo dorado" width="1200" height="750" loading="lazy" decoding="async" data-parallax />
+              <img src="/alldesign-karl/col-azul.webp" alt="Pieza decorativa pintada a mano con flores azules y filo dorado" width="1200" height="750" loading="lazy" decoding="async" data-parallax />
             </figure>
             <div class="collection__caption">
               <span class="collection__num">01</span>
-              <h3>Colección Azul</h3>
-              <p>Vajilla y cuencos pintados en cobalto</p>
+              <h3>Decoración</h3>
+              <p>Piezas decorativas pintadas a mano</p>
               <svg class="arrow" viewBox="0 0 40 12" aria-hidden="true"><path d="M0 6h38M33 1l5 5-5 5" /></svg>
             </div>
           </a>
@@ -173,8 +170,8 @@
             </figure>
             <div class="collection__caption">
               <span class="collection__num">02</span>
-              <h3>Colección Botánica</h3>
-              <p>Aromas, flores y hierbas de la huerta aragonesa</p>
+              <h3>Regalos para empresas</h3>
+              <p>Detalles artesanales para clientes y equipos</p>
               <svg class="arrow" viewBox="0 0 40 12" aria-hidden="true"><path d="M0 6h38M33 1l5 5-5 5" /></svg>
             </div>
           </a>
@@ -185,20 +182,20 @@
             </figure>
             <div class="collection__caption">
               <span class="collection__num">03</span>
-              <h3>Colección Escultórica</h3>
-              <p>Jarrones, vasijas y piezas de gran formato</p>
+              <h3>Productos artesanales</h3>
+              <p>Cerámica, cestería y piezas hechas a mano</p>
               <svg class="arrow" viewBox="0 0 40 12" aria-hidden="true"><path d="M0 6h38M33 1l5 5-5 5" /></svg>
             </div>
           </a>
 
           <a class="collection collection--4" href="#contacto" data-cursor="Ver">
             <figure class="collection__media" data-mask>
-              <img src="/alldesign-karl/col-ediciones.webp" alt="Fragmentos de porcelana con filo de oro suspendidos en el aire" width="640" height="1400" loading="lazy" decoding="async" data-parallax />
+              <img src="/alldesign-karl/col-ediciones.webp" alt="Fragmentos decorativos con filo de oro suspendidos en el aire" width="640" height="1400" loading="lazy" decoding="async" data-parallax />
             </figure>
             <div class="collection__caption">
               <span class="collection__num">04</span>
-              <h3>Ediciones Especiales</h3>
-              <p>Piezas reparadas con oro, series numeradas</p>
+              <h3>Pedidos personalizados</h3>
+              <p>Diseñados a medida, en pequeñas o grandes cantidades</p>
               <svg class="arrow" viewBox="0 0 40 12" aria-hidden="true"><path d="M0 6h38M33 1l5 5-5 5" /></svg>
             </div>
           </a>
@@ -212,7 +209,7 @@
         <div class="craft__pin">
           <header class="craft__head">
             <p class="kicker" data-reveal>Artesanía</p>
-            <h2 class="display" data-reveal>Del barro<br /><em>a la pieza</em></h2>
+            <h2 class="display" data-reveal>De la idea<br /><em>al regalo</em></h2>
             <p class="craft__progress" aria-hidden="true"><span data-craft-bar></span></p>
           </header>
 
@@ -226,8 +223,8 @@
                 <path d="M146 150l26-100 6 2-26 100-8 6z" />
               </svg>
               <span class="step__num">I</span>
-              <h3>Diseño</h3>
-              <p>Todo empieza en el papel. Dibujamos la silueta, la proporción y el recorrido de cada rama antes de tocar el material.</p>
+              <h3>Idea</h3>
+              <p>Escuchamos qué necesita tu empresa: para quién es, para qué ocasión y qué queréis transmitir.</p>
             </li>
             <li class="step" data-n="II">
               <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
@@ -237,8 +234,8 @@
                 <path d="M30 96c10-6 20-6 26 4M170 96c-10-6-20-6-26 4" />
               </svg>
               <span class="step__num">II</span>
-              <h3>Modelado</h3>
-              <p>La pasta de porcelana se trabaja a mano y en torno. Se deja secar despacio para que no se agriete, a veces durante semanas.</p>
+              <h3>Diseño</h3>
+              <p>Proponemos piezas, materiales y acabados, y adaptamos cada detalle a vuestra imagen.</p>
             </li>
             <li class="step" data-n="III">
               <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
@@ -247,8 +244,8 @@
                 <path d="M150 40l30-24M150 40l-6 10 10-4z" />
               </svg>
               <span class="step__num">III</span>
-              <h3>Decoración</h3>
-              <p>El azul cobalto se aplica a pincel, en crudo. No hay plantillas: cada hoja se pinta de una sola vez y no admite rectificación.</p>
+              <h3>Elaboración</h3>
+              <p>Hacemos cada pieza a mano, en casa y sin prisas. Por eso ninguna es exactamente igual a otra.</p>
             </li>
             <li class="step" data-n="IV">
               <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
@@ -258,8 +255,8 @@
                 <path class="gold" d="M84 120c-8-12 6-18 0-30M100 116c-8-14 8-22 0-36M116 120c-8-12 6-18 0-30" />
               </svg>
               <span class="step__num">IV</span>
-              <h3>Horneado</h3>
-              <p>La cocción a 1.280 °C vitrifica la pasta y funde el esmalte con el azul. Es el momento en que la pieza deja de ser nuestra.</p>
+              <h3>Personalización</h3>
+              <p>Logotipo, mensaje, colores o embalaje: el regalo lleva la firma de tu empresa.</p>
             </li>
             <li class="step" data-n="V">
               <svg class="step__art" viewBox="0 0 200 200" aria-hidden="true">
@@ -268,8 +265,8 @@
                 <path class="gold" d="M160 44c.4 5.6 3.4 8.6 9 9-5.6.4-8.6 3.4-9 9-.4-5.6-3.4-8.6-9-9 5.6-.4 8.6-3.4 9-9Z" />
               </svg>
               <span class="step__num">V</span>
-              <h3>Acabado</h3>
-              <p>Pulido, revisión a contraluz y, en las ediciones especiales, oro aplicado a mano. Solo entonces la pieza lleva nuestra firma.</p>
+              <h3>Entrega</h3>
+              <p>Revisamos cada pieza, la presentamos con cuidado y la entregamos en la fecha acordada.</p>
             </li>
           </ol>
           </div>
@@ -289,16 +286,15 @@
             Cada pieza nace de una idea, pero cobra vida a través de las manos.
           </blockquote>
           <p data-reveal>
-            Alldesign Karl es un pequeño taller de porcelana en Aragón. Trabajamos sin prisa y sin
-            moldes de serie: cada pieza se modela, se pinta y se hornea aquí, y pasa por las mismas
-            manos de principio a fin.
+            Alldesign Karl es un proyecto familiar de Vanessa Pueyo Escolano y Carlos Lafuente Pueyo.
+            Nació en casa, con las manos y mucha ilusión, y hoy trabajamos sobre todo con otras
+            empresas: regalos, decoración y pedidos personalizados hechos a mano.
           </p>
           <p data-reveal>
-            Nos inspira la loza tradicional, las flores del campo y la idea de que un objeto puede
-            guardar el tiempo que costó hacerlo. Por eso firmamos cada pieza, y por eso ninguna es
-            igual a otra.
+            Cuidamos cada encargo como si fuera para nosotros: escuchamos, proponemos y hacemos cada
+            pieza con calma. Por eso firmamos lo que hacemos, y por eso ninguna pieza es igual a otra.
           </p>
-          <p class="signature" data-reveal>Karl</p>
+          <img class="about__logo" src="/alldesign-karl/logo-256.webp" alt="Logotipo de Alldesign Karl" width="256" height="256" loading="lazy" data-reveal />
           <figure class="about__detail" data-mask>
             <img src="/alldesign-karl/foto-vela.webp" alt="Vela artesanal encendida sobre una piedra, con luz cálida y sombras de hojas" width="736" height="1104" loading="lazy" decoding="async" />
           </figure>
@@ -338,8 +334,8 @@
 
     <footer class="footer">
       <div class="footer__top">
-        <a class="footer__logo" href="#inicio">Alldesign Karl</a>
-        <p class="footer__claim">Porcelana hecha a mano<br />en Aragón</p>
+        <a class="footer__logo" href="#inicio"><img class="footer__mark" src="/alldesign-karl/logo-256.webp" alt="" width="256" height="256" loading="lazy" />Alldesign Karl</a>
+        <p class="footer__claim">Hecho a mano<br />en Aragón</p>
       </div>
       <div class="footer__cols">
         <nav aria-label="Pie">
@@ -383,7 +379,7 @@
       <button class="panel__close" type="button" data-close aria-label="Cerrar">Cerrar</button>
       <form class="search" role="search" data-search>
         <label class="kicker" for="q">Buscar en el catálogo</label>
-        <input id="q" name="q" type="search" placeholder="Busto, cuenco, azul…" autocomplete="off" />
+        <input id="q" name="q" type="search" placeholder="Regalos, decoración, personalizado…" autocomplete="off" />
         <ul class="search__results" data-search-results></ul>
       </form>
     </div>
