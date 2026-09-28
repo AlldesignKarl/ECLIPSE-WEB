@@ -133,64 +133,6 @@ ${h('Archivos adjuntos')}<p style="margin:0;font-size:15px;line-height:1.6">${fi
   return { subject: `Nueva solicitud de presupuesto - ${p.empresa}`, text, html };
 }
 
-// Envio sin clave: FormSubmit (https://formsubmit.co) reenvia el formulario
-// al email indicado. La primera vez manda a ese email un mensaje para
-// activarlo; tras pulsar "Activate Form" las solicitudes llegan directamente.
-async function sendWithFormSubmit(
-  request: Request,
-  to: string,
-  p: QuotePayload,
-  files: QuoteFile[],
-  subject: string,
-  when: string,
-): Promise<Response> {
-  const fd = new FormData();
-  fd.append('_subject', subject);
-  fd.append('_template', 'table');
-  fd.append('_captcha', 'false');
-  fd.append('_replyto', p.email);
-  const fields: [string, string][] = [
-    ['Nombre', p.nombre],
-    ['Cargo', p.cargo],
-    ['Email', p.email],
-    ['Teléfono', p.telefono],
-    ['Empresa', p.empresa],
-    ['CIF/NIF', p.cif],
-    ['Web', p.web],
-    ['Producto/servicio', p.producto],
-    ['Cantidad', p.cantidad],
-    ['Tipo de proyecto', p.tipo],
-    ['Fecha aproximada', p.fecha],
-    ['Presupuesto', p.presupuesto],
-    ['Ciudad/provincia', p.ciudad],
-    ['Descripción', p.descripcion],
-    ['Archivos adjuntos', files.length ? files.map((f) => f.name).join(', ') : 'Ninguno'],
-    ['Acepta recibir información', p.comunicaciones ? 'Sí' : 'No'],
-    ['Fecha y hora de solicitud', when],
-  ];
-  for (const [k, v] of fields) fd.append(k, v || '—');
-  files.forEach((f, i) => {
-    const bytes = Uint8Array.from(atob(f.data), (c) => c.charCodeAt(0));
-    fd.append(i === 0 ? 'attachment' : `attachment${i + 1}`, new Blob([bytes], { type: f.type }), f.name);
-  });
-  const origin = request.headers.get('origin') || 'https://alldesignkarl.vercel.app';
-  const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
-    method: 'POST',
-    headers: { Accept: 'application/json', Referer: `${origin}/alldesign-karl/presupuesto/`, Origin: origin },
-    body: fd,
-  });
-  const out = (await res.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
-  if (res.ok && String(out.success) === 'true') return json(200, { ok: true });
-  console.error('[presupuesto] FormSubmit respondio', res.status, out.message ?? '');
-  const pending = /activ/i.test(out.message ?? '');
-  return json(502, {
-    ok: false,
-    error: pending
-      ? 'Estamos terminando de activar el formulario. Mientras tanto, escríbenos a alldesignkarl@gmail.com o llámanos al 661 30 79 18.'
-      : 'No hemos podido enviar la solicitud. Inténtalo de nuevo en unos minutos o escríbenos a alldesignkarl@gmail.com.',
-  });
-}
-
 export async function POST(request: Request): Promise<Response> {
   let body: Record<string, unknown>;
   try {
@@ -245,7 +187,9 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const key = process.env.RESEND_API_KEY;
-  if (!key) return sendWithFormSubmit(request, to, p, files, mail.subject, when);
+  // Sin clave de Resend, el envio lo hace el navegador con FormSubmit, que
+  // rechaza las peticiones que salen de servidores. Aqui ya se ha validado todo.
+  if (!key) return json(200, { ok: true, relay: 'formsubmit', to, subject: mail.subject, when });
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -268,31 +212,3 @@ export async function POST(request: Request): Promise<Response> {
   return json(200, { ok: true });
 }
 
-// Prueba de envio: GET /api/presupuesto?test=<TEST_TOKEN> manda una solicitud
-// de ejemplo por el mismo camino que el formulario. Sin la variable TEST_TOKEN
-// (o con un valor distinto) no hace nada.
-export async function GET(request: Request): Promise<Response> {
-  const token = process.env.TEST_TOKEN;
-  const q = new URL(request.url).searchParams.get('test');
-  if (!token || q !== token) return new Response(null, { status: 405 });
-  const sample = {
-    nombre: 'Prueba de la web',
-    cargo: 'Prueba técnica',
-    email: 'alldesignkarl@gmail.com',
-    telefono: '661 30 79 18',
-    empresa: 'PRUEBA Alldesign Karl',
-    producto: 'Regalos para empresas',
-    cantidad: '10 unidades',
-    tipo: 'Pedido puntual',
-    ciudad: 'Zaragoza',
-    descripcion: 'Esto es una solicitud de prueba enviada desde la web para comprobar que los presupuestos llegan al correo.',
-    privacidad: true,
-  };
-  return POST(
-    new Request(request.url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', origin: new URL(request.url).origin },
-      body: JSON.stringify(sample),
-    }),
-  );
-}

@@ -323,7 +323,7 @@ form.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(d),
     });
-    const out = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; fields?: Record<string, string> };
+    const out = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; fields?: Record<string, string>; relay?: string; to?: string; subject?: string; when?: string };
     if (!res.ok || !out.ok) {
       if (out.fields) {
         const fields = out.fields;
@@ -334,6 +334,13 @@ form.addEventListener('submit', async (e) => {
       fail(out.error || 'No hemos podido enviar la solicitud. Inténtalo de nuevo en unos minutos.');
       return;
     }
+    if (out.relay === 'formsubmit') {
+      const sent = await relayFormSubmit(d, out.to!, out.subject!, out.when!);
+      if (sent !== true) {
+        fail(sent);
+        return;
+      }
+    }
     success();
   } catch {
     fail('No hay conexión. Comprueba tu red e inténtalo de nuevo; tus datos siguen aquí.');
@@ -341,6 +348,55 @@ form.addEventListener('submit', async (e) => {
     setSending(false);
   }
 });
+
+// Envio con FormSubmit desde el navegador (sin clave). La primera vez
+// FormSubmit manda al correo de destino un email para activar el formulario.
+async function relayFormSubmit(d: QuotePayload, to: string, subject: string, when: string): Promise<true | string> {
+  const fd = new FormData();
+  fd.append('_subject', subject);
+  fd.append('_template', 'table');
+  fd.append('_captcha', 'false');
+  fd.append('_replyto', d.email);
+  const fecha = d.fecha ? new Date(`${d.fecha}T12:00:00`).toLocaleDateString('es-ES', { dateStyle: 'long' }) : '';
+  const rows: [string, string][] = [
+    ['Nombre', d.nombre],
+    ['Cargo', d.cargo],
+    ['Email', d.email],
+    ['Teléfono', d.telefono],
+    ['Empresa', d.empresa],
+    ['CIF/NIF', d.cif],
+    ['Web', d.web],
+    ['Producto/servicio', d.producto],
+    ['Cantidad', d.cantidad],
+    ['Tipo de proyecto', d.tipo],
+    ['Fecha aproximada', fecha],
+    ['Presupuesto', d.presupuesto],
+    ['Ciudad/provincia', d.ciudad],
+    ['Descripción', d.descripcion],
+    ['Archivos adjuntos', files.length ? files.map((f) => f.name).join(', ') : 'Ninguno'],
+    ['Acepta recibir información', d.comunicaciones ? 'Sí' : 'No'],
+    ['Fecha y hora de solicitud', when],
+  ];
+  for (const [k, v] of rows) fd.append(k, v || '—');
+  files.forEach((f, i) => {
+    const bytes = Uint8Array.from(atob(f.data), (c) => c.charCodeAt(0));
+    fd.append(i === 0 ? 'attachment' : `attachment${i + 1}`, new Blob([bytes], { type: f.type }), f.name);
+  });
+  try {
+    const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      body: fd,
+    });
+    const out = (await res.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
+    if (res.ok && String(out.success) === 'true') return true;
+    if (/activ/i.test(out.message ?? ''))
+      return 'Estamos terminando de activar el formulario. Mientras tanto, escríbenos a alldesignkarl@gmail.com o llámanos al 661 30 79 18.';
+  } catch {
+    /* sin conexion con el servicio de envio */
+  }
+  return 'No hemos podido enviar la solicitud. Inténtalo de nuevo en unos minutos o escríbenos a alldesignkarl@gmail.com.';
+}
 
 function success() {
   const body = $('[data-quote-body]');
