@@ -116,6 +116,7 @@ async function deliver(
   replyTo: string,
   extra: Record<string, unknown>,
   mail?: { html: string; text: string },
+  relayRows?: [string, string][],
 ) {
   const text = mail?.text ?? rows.map(([k, v]) => `${k}: ${v}`).join('\n');
   // Primero se guarda: aunque el correo falle, queda en el panel de pedidos.
@@ -132,7 +133,7 @@ async function deliver(
   }
   // Sin Gmail ni Resend configurados, el navegador lo reenvia con FormSubmit.
   const [to, ...cc] = recipients();
-  return json(200, { ok: true, relay: 'formsubmit', to, cc: cc.join(','), subject, rows, ...extra });
+  return json(200, { ok: true, relay: 'formsubmit', to, cc: cc.join(','), subject, rows: relayRows ?? rows, ...extra });
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -199,6 +200,23 @@ export async function POST(request: Request): Promise<Response> {
     cliente.email,
     { ref, subtotal },
     mail,
+    // Version corta y ordenada para el correo de FormSubmit (tabla sencilla).
+    [
+      ['Pedido', `${ref} · ${when}`],
+      ['Empresa', cliente.empresa],
+      ['Total sin IVA', `${eur(subtotal)} (${units} unidades)`],
+      ...lines.map((l, i) => [
+        `Producto ${i + 1}`,
+        `${l.qty} × ${l.name} — ${eur(l.total)}${l.detalle ? `\n${l.detalle.split(' · ').join('\n')}` : ''}`,
+      ] as [string, string]),
+      ['Observaciones', notas || '—'],
+      ['Contacto', cliente.nombre],
+      ['Email', cliente.email],
+      ['Teléfono', cliente.telefono],
+      ['NIF/CIF', cliente.nif],
+      ['DNI/NIE', cliente.dni],
+      ...(cliente.nifIva ? [['NIF-IVA', cliente.nifIva] as [string, string]] : []),
+    ],
   );
 }
 
