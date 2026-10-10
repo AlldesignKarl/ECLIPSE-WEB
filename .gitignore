@@ -13,3 +13,4 @@ dist
 .og.mjs
 .nuevo.mjs
 .final.mjs
+*.tsbuildinfo
