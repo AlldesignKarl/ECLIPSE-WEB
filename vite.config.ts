@@ -2,7 +2,7 @@ import { resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// En produccion /api/presupuesto es una funcion de Vercel (api/presupuesto.ts).
+// En produccion /api/presupuesto y /api/mayoristas son funciones de Vercel (api/*.ts).
 // En desarrollo Vite no la sirve: este puente la ejecuta con la misma firma
 // (Request -> Response) para poder probar el formulario en local.
 function apiDev(): Plugin {
@@ -10,10 +10,12 @@ function apiDev(): Plugin {
     name: 'alldesign-api-dev',
     apply: 'serve',
     configureServer(server) {
-      server.middlewares.use('/api/presupuesto', async (req, res) => {
+      server.middlewares.use('/api', async (req, res, next) => {
+        const name = /^\/(presupuesto|mayoristas)\b/.exec(req.url ?? '')?.[1];
+        if (!name) return next();
         const chunks: Buffer[] = [];
         for await (const c of req) chunks.push(c as Buffer);
-        const mod = await server.ssrLoadModule('/api/presupuesto.ts');
+        const mod = await server.ssrLoadModule(`/api/${name}.ts`);
         const handler = req.method === 'POST' ? mod.POST : null;
         if (!handler) {
           res.statusCode = 405;

@@ -1,4 +1,7 @@
-[
+// Copia de los productos de Wix (10/10/2026). La web y el servidor la usan si
+// Wix no responde; con Wix disponible se usan siempre los datos en directo.
+/* eslint-disable */
+const PRODUCTS: any[] = [
  {
   "id": "2435d64f-e41d-4995-b730-f3a8cc13ed5a",
   "name": "Letra de resina iluminada",
@@ -356,4 +359,5 @@
    }
   }
  }
-]
+];
+export default PRODUCTS;

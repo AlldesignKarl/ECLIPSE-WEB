@@ -38,9 +38,8 @@
     <a class="brand" href="/alldesign-karl/" aria-label="Alldesign Karl, volver a la web"><img class="brandmark" src="/alldesign-karl/logo-256.webp" alt="" width="256" height="256" /></a>
     <nav class="nav" aria-label="Principal">
       <a href="/alldesign-karl/">Inicio</a>
-      <a href="#colecciones" aria-current="page">Tienda</a>
+      <a href="#colecciones" aria-current="page">Mayoristas</a>
       <a href="#nosotros">Sobre nosotros</a>
-      <a href="#tarjeta-regalo">Tarjeta regalo</a>
       <a href="/alldesign-karl/presupuesto/">Empresas</a>
       <a href="#contacto">Contacto</a>
     </nav>
@@ -77,11 +76,12 @@
   <section class="shop sec" id="colecciones">
     <div class="wrap">
       <div class="sec-title">
-        <p class="caps reveal">Catálogo</p>
+        <p class="caps reveal">Tienda para mayoristas</p>
         <h2 class="reveal">Nuestras colecciones</h2>
         <p class="reveal">Piezas pintadas a mano, una a una, con el tiempo y el cuidado que merece lo auténtico.</p>
         <div class="ornament reveal" aria-hidden="true"><svg class="star"><use href="#i-star"/></svg></div>
       </div>
+      <p class="who" id="who" aria-live="polite"></p>
       <div class="toolbar" id="toolbar" hidden></div>
       <div class="grid" id="grid" aria-live="polite"></div>
       <div class="empty" id="empty" hidden>
@@ -124,40 +124,6 @@
     </div>
   </section>
 
-  <section class="gift sec" id="tarjeta-regalo">
-    <div class="wrap">
-      <div class="sec-title">
-        <p class="caps reveal">Para regalar</p>
-        <h2 class="reveal">Tarjeta regalo</h2>
-        <p class="reveal">El regalo perfecto cuando no sabes qué elegir: que elijan ellos su pieza favorita.</p>
-        <div class="ornament reveal" aria-hidden="true"><svg class="star"><use href="#i-star"/></svg></div>
-      </div>
-      <div class="gift-grid">
-        <div class="gift-art reveal">
-          <div class="gift-card">
-            <div class="gift-fallback" aria-hidden="true"><span class="script">Alldesign Karl</span><span class="caps">Tarjeta regalo</span></div>
-            <img id="gc-img" src="https://static.wixstatic.com/media/43eaa1_5439905b93b943498e6a185ac4867adb~mv2.jpg/v1/fit/w_1200,h_800,q_90,enc_auto/tarjeta-regalo.jpg" alt="Tarjeta regalo de Alldesign Karl" loading="lazy">
-          </div>
-        </div>
-        <div class="gift-copy reveal">
-          <p class="gift-lead" id="gc-desc">Regala la libertad de elegir. Una tarjeta regalo perfecta para disfrutar de sus piezas favoritas y encontrar algo especial.</p>
-          <div class="opt">
-            <div class="opt-label">Elige el importe<span class="opt-picked" id="gc-picked"></span></div>
-            <div class="gift-amounts" id="gc-amounts"></div>
-          </div>
-          <ul class="gift-how">
-            <li><svg><use href="#i-star"/></svg><span>Al comprarla, recibes la tarjeta con su código en tu correo.</span></li>
-            <li><svg><use href="#i-star"/></svg><span>Puedes reenviarla o imprimirla para regalarla a quien quieras.</span></li>
-            <li><svg><use href="#i-star"/></svg><span id="gc-expiry">Se canjea al pagar en nuestra tienda y no caduca.</span></li>
-          </ul>
-          <div class="pd-actions">
-            <button class="pill dark caps" id="gc-add" type="button" disabled>Añadir a la cesta <svg class="arrow"><use href="#i-arrow"/></svg></button>
-          </div>
-          <p class="pd-note" id="gc-note">Elige un importe.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 </main>
 
   <section class="contact sec" id="contacto">
@@ -187,7 +153,6 @@
         <h4 class="caps">Explorar</h4>
         <a href="/alldesign-karl/">La web</a>
         <a href="#colecciones">Tienda</a>
-        <a href="#tarjeta-regalo">Tarjeta regalo</a>
         <a href="/alldesign-karl/presupuesto/">Pedir presupuesto</a>
       </div>
       <div class="foot-col">
@@ -215,7 +180,6 @@
   <nav>
     <a href="/alldesign-karl/">Inicio</a>
     <a href="#colecciones">Tienda</a>
-    <a href="#tarjeta-regalo">Tarjeta regalo</a>
     <a href="/alldesign-karl/presupuesto/">Empresas</a>
     <a href="#contacto">Contacto</a>
   </nav>
@@ -225,7 +189,6 @@
     <a href="#colecciones">Colecciones</a>
     <a href="#nosotros">Sobre nosotros</a>
     <a href="#contacto">Contacto</a>
-    <a href="#tarjeta-regalo">Tarjeta regalo</a>
   </nav>
   <p class="menu-foot caps">Porcelana · Arte · Tradición</p>
 </div>
@@ -270,21 +233,49 @@
   </div>
 </div>
 
-<aside class="drawer" id="cart" role="dialog" aria-modal="true" aria-label="Tu cesta" aria-hidden="true">
+<aside class="drawer" id="cart" role="dialog" aria-modal="true" aria-label="Tu pedido" aria-hidden="true">
   <div class="drawer-head">
-    <h2>Tu cesta</h2>
+    <h2>Tu pedido</h2>
     <button class="icon-btn" data-close aria-label="Cerrar la cesta"><svg><use href="#i-close"/></svg></button>
   </div>
   <div class="drawer-body" id="cart-body"></div>
   <div class="drawer-foot" id="cart-foot" hidden>
-    <div class="subtotal"><span>Subtotal (sin IVA)</span><strong id="cart-subtotal"></strong></div>
-    <div class="subtotal"><span>IVA (21 %)</span><strong id="cart-vat"></strong></div>
-    <div class="subtotal"><span>Envío</span><strong>Gratis</strong></div>
-    <div class="subtotal total"><span>Total</span><strong id="cart-total"></strong></div>
-    <small>Precios sin IVA. Al total se le suma el IVA del 21 %.</small>
-    <button class="pill dark caps" id="checkout" type="button">Finalizar compra <svg class="arrow"><use href="#i-arrow"/></svg></button>
+    <div class="subtotal total"><span>Total (sin IVA)</span><strong id="cart-subtotal"></strong></div>
+    <div class="cart-min" id="cart-min" hidden></div>
+    <div class="cart-bar" id="cart-bar" aria-hidden="true"><span></span></div>
+    <small>Precios mayoristas sin IVA. Pedido mínimo 100 € sin IVA. Te confirmaremos el pedido, el envío y la forma de pago por correo.</small>
+    <label class="cart-notes"><span>Observaciones (opcional)</span><textarea id="cart-notes" rows="2" maxlength="1000" placeholder="Fecha de entrega, dirección de envío, personalizaciones…"></textarea></label>
+    <button class="pill dark caps" id="checkout" type="button" disabled>Enviar pedido <svg class="arrow"><use href="#i-arrow"/></svg></button>
+    <p class="cart-msg" id="cart-msg" role="status" aria-live="polite"></p>
   </div>
 </aside>
+
+
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" hidden>
+  <div class="gate-card">
+    <a class="gate-back" href="/alldesign-karl/">← Volver a la web</a>
+    <img class="brandmark gate-logo" src="/alldesign-karl/logo-256.webp" alt="" width="256" height="256" />
+    <p class="caps">Tienda para mayoristas</p>
+    <h2 id="gate-title">Alta de empresa</h2>
+    <p class="gate-lead">Para ver precios mayoristas (sin IVA) y hacer pedidos, déjanos los datos de tu empresa. Solo te lo pediremos una vez. Pedido mínimo: 100 € sin IVA.</p>
+    <form id="gate-form" novalidate>
+      <div class="gate-grid">
+        <label class="f wide"><span>Empresa / razón social *</span><input name="empresa" autocomplete="organization" maxlength="160" required><em data-err="empresa"></em></label>
+        <label class="f wide"><span>Nombre y apellidos *</span><input name="nombre" autocomplete="name" maxlength="120" required><em data-err="nombre"></em></label>
+        <label class="f"><span>Correo electrónico *</span><input name="email" type="email" autocomplete="email" maxlength="160" required><em data-err="email"></em></label>
+        <label class="f"><span>Teléfono *</span><input name="telefono" type="tel" autocomplete="tel" maxlength="40" required><em data-err="telefono"></em></label>
+        <label class="f"><span>NIF / CIF de la empresa *</span><input name="nif" autocapitalize="characters" maxlength="20" placeholder="B12345674" required><em data-err="nif"></em></label>
+        <label class="f"><span>DNI / NIE *</span><input name="dni" autocapitalize="characters" maxlength="20" placeholder="12345678Z" required><em data-err="dni"></em></label>
+        <label class="f wide"><span>NIF-IVA intracomunitario <small>(solo empresas de la UE fuera de España, opcional)</small></span><input name="nifIva" autocapitalize="characters" maxlength="20" placeholder="FR12345678901"><em data-err="nifIva"></em></label>
+      </div>
+      <input class="hp" name="website2" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label class="check"><input type="checkbox" name="privacidad"><span>He leído y acepto la <a href="/alldesign-karl/privacidad/" target="_blank" rel="noopener">política de privacidad</a>. *</span></label>
+      <em class="check-err" data-err="privacidad"></em>
+      <button class="pill dark caps" id="gate-send" type="submit">Entrar a la tienda <svg class="arrow"><use href="#i-arrow"/></svg></button>
+      <p class="gate-msg" id="gate-msg" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

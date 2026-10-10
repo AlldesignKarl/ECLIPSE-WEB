@@ -9,7 +9,8 @@ import './shop.css';
 import { CONTACT, applyContact } from './contact';
 // Copia de los productos de Wix (10/10/2026): se ven al instante y siguen
 // viéndose si Wix tarda en responder. Al cargar, se sustituyen por los de Wix.
-import SNAPSHOT from './shop-products.json';
+import SNAPSHOT from './shop-products.js';
+import { MIN_ORDER, validateRegistro, normId, round2 } from './wholesale';
 
 applyContact();
 
@@ -170,7 +171,7 @@ applyContact();
     var cmp = p.compareAtPriceRange && p.compareAtPriceRange.minValue && net(p.compareAtPriceRange.minValue.amount * pk);
     var html = "";
     if (cmp && Number(cmp) > Number(min)) html += "<s>" + esc(money(cmp, cur)) + "</s>";
-    html += (max && Number(max) > Number(min) ? "Desde " : "") + esc(money(min, cur)) + '<span class="vat">+ IVA</span>';
+    html += (max && Number(max) > Number(min) ? "Desde " : "") + esc(money(min, cur)) + '<span class="vat">sin IVA</span>';
     return html;
   }
   function inStock(p) {
@@ -262,6 +263,7 @@ applyContact();
       $("empty").hidden = true;
       renderToolbar();
       renderGrid();
+      refreshCartPrices();
     }).catch(function () {
       // Sin respuesta de Wix se quedan los productos de la copia.
     });
@@ -282,6 +284,7 @@ applyContact();
   /* ---------------- ficha de producto ---------------- */
   var current = null;
   var variants = [];
+  var variantsFailed = false;
   var picked = {};
   var texts = {};
   var qty = 1;
@@ -384,7 +387,7 @@ applyContact();
 
   function matchVariant() {
     var opts = current && current.options || [];
-    if (!variants.length) return null;
+    if (!variants.length) return variantsFailed ? {} : null;
     if (!opts.length) return variants[0];
     for (var i = 0; i < variants.length; i++) {
       var v = variants[i];
@@ -433,7 +436,7 @@ applyContact();
     } else if (v && v.inventoryStatus && v.inventoryStatus.inStock === false) {
       add.disabled = true;
       note.textContent = "Agotado por ahora.";
-    } else if (!variants.length) {
+    } else if (!variants.length && !variantsFailed) {
       add.disabled = true;
       note.textContent = "Cargando disponibilidad…";
     } else {
@@ -454,7 +457,7 @@ applyContact();
     var total = Math.round(Number(unit) * qty * 100) / 100;
     var cmp = cmpUnit ? Math.round(Number(cmpUnit) * qty * 100) / 100 : 0;
     $("pd-price").innerHTML = (cmp > total ? "<s>" + esc(money(net(cmp), cur)) + "</s>" : "") + esc(money(net(total), cur)) +
-      '<span class="pd-vat">IVA no incluido · ' + esc(money(gross(total), cur)) + " con IVA</span>";
+      '<span class="pd-vat">Precio mayorista · IVA no incluido</span>';
   }
 
   function renderOptions() {
@@ -531,6 +534,7 @@ applyContact();
     current = findProduct(id);
     if (!current) return;
     variants = [];
+    variantsFailed = false;
     picked = {};
     texts = {};
     second = null;
@@ -570,8 +574,9 @@ applyContact();
       renderPdState();
     }).catch(function () {
       if (!current || current.id !== forId) return;
-      $("pd-note").textContent = "No se ha podido cargar la disponibilidad. Inténtalo de nuevo.";
-      $("pd-note").classList.add("error");
+      // Sin Wix se puede pedir igual: el pedido llega por correo con las opciones elegidas.
+      variantsFailed = true;
+      renderPdState();
     });
   }
 
@@ -665,233 +670,237 @@ applyContact();
   $("pd-minus").addEventListener("click", function () { var pk = packOf(current); qty = Math.max(pk, qty - pk); $("pd-qty").textContent = qty; renderPrice(matchVariant()); });
   $("pd-plus").addEventListener("click", function () { var pk = packOf(current); qty = Math.min(99 * pk, qty + pk); $("pd-qty").textContent = qty; renderPrice(matchVariant()); });
 
+  // Opciones elegidas, en texto, para el pedido (color, letra, aroma...).
+  function pickedDetail() {
+    var parts = [];
+    var po = pairOpt();
+    (current.options || []).forEach(function (o) {
+      if (!picked[o.id]) return;
+      var n = choiceName(o, picked[o.id]);
+      if (o === po && second) parts.push("Colores: " + n + " + " + choiceName(o, second));
+      else parts.push((o.name || "") + ": " + n);
+    });
+    var pm = pairMod();
+    textMods().forEach(function (m) {
+      if (m === pm) return;
+      var val = texts[modKey(m)];
+      if (val) parts.push((modMax(m) === 1 ? "Letra" : m.name || "") + ": " + val);
+    });
+    return parts.join(" · ");
+  }
+  function unitOf(p, v) {
+    var u = v && v.price && v.price.actualPrice && v.price.actualPrice.amount;
+    if (!u) { var r = p.actualPriceRange || {}; u = r.minValue && r.minValue.amount; }
+    return Number(u) || 0;
+  }
+
   $("pd-add").addEventListener("click", function () {
     var v = matchVariant();
     if (!current || !v) return;
-    var btn = $("pd-add");
-    btn.disabled = true;
-    $("pd-note").textContent = "Añadiendo…";
-    var refOptions = { variantId: v.variantId || v.id };
-    var custom = {};
-    var hasCustom = false;
-    textMods().forEach(function (m) {
-      var val = texts[modKey(m)];
-      if (val) { custom[modKey(m)] = val; hasCustom = true; }
-    });
-    if (hasCustom) refOptions.customTextFields = custom;
-    var body = {
-      catalogItems: [{
-        catalogReference: {
-          catalogItemId: current.id,
-          appId: STORES_APP_ID,
-          options: refOptions
-        },
-        quantity: qty
-      }]
-    };
-    api("POST", "/ecom/v2/carts/current/add-line-items", body).then(function (data) {
-      setCart(data.cart);
-      closeLayers();
-      setTimeout(function () { openLayer("cart"); }, reduceMotion ? 0 : 350);
-      var badge = $("bag-count");
-      badge.classList.remove("bump");
-      void badge.offsetWidth;
-      badge.classList.add("bump");
-    }).catch(function () {
-      $("pd-note").textContent = "No se ha podido añadir. Inténtalo de nuevo en unos segundos.";
-      $("pd-note").classList.add("error");
-    }).then(function () { btn.disabled = false; });
+    var detail = pickedDetail();
+    var key = current.id + "|" + detail;
+    var line = null;
+    cart.forEach(function (l) { if (l.key === key) line = l; });
+    if (line) line.qty += qty;
+    else cart.push({ key: key, productId: current.id, name: (current.name || "").trim(), detalle: detail, qty: qty, unit: unitOf(current, v), pack: packOf(current), img: allImages(current)[0] || "" });
+    saveCart();
+    renderCart();
+    closeLayers();
+    setTimeout(function () { openLayer("cart"); }, reduceMotion ? 0 : 350);
+    var badge = $("bag-count");
+    badge.classList.remove("bump");
+    void badge.offsetWidth;
+    badge.classList.add("bump");
   });
 
-  /* ---------------- cesta ---------------- */
-  var cart = null;
+  /* ---------------- cesta mayorista (pedido mínimo, precios sin IVA) ---------------- */
+  var CART_KEY = "adk.mayoristas.cesta.v1";
+  var REG_KEY = "adk.mayoristas.registro.v1";
+  var cart = [];
+  try { cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]") || []; } catch (e) { cart = []; }
+  function saveCart() { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) {} }
+  function cartTotal() { return round2(cart.reduce(function (s, l) { return s + l.unit * l.qty; }, 0)); }
 
-  function lineQty(li) {
-    return li.quantityInfo && (li.quantityInfo.requestedQuantity || li.quantityInfo.confirmedQuantity) || 1;
-  }
-  function descLines(li) {
-    var lines = li.attributes && li.attributes.descriptionLines || [];
-    var hasSecond = lines.some(function (d) { return d.name && (d.name.original || "").toLowerCase() === "segundo color"; });
-    return lines.map(function (d) {
-      var n = d.name && (d.name.translated || d.name.original) || "";
-      if (hasSecond && n === "Color") n = "Primer color";
-      if (d.name && d.name.original === "Amount") n = "Importe";
-      // La pregunta del campo de letra se muestra abreviada en la cesta.
-      if (n.indexOf("?") !== -1 && n.toLowerCase().indexOf("letra") !== -1) n = "Letra";
-      var val = d.plainText && (d.plainText.translated || d.plainText.original) ||
-        d.colorInfo && (d.colorInfo.translated || d.colorInfo.original) || "";
-      return n && val ? n + ": " + val : (n || val);
-    }).filter(Boolean).join(String.fromCharCode(10));
+  // Con el catálogo de Wix cargado, los precios de la cesta se ponen al día.
+  function refreshCartPrices() {
+    cart = cart.filter(function (l) { return findProduct(l.productId); });
+    cart.forEach(function (l) { l.unit = unitOf(findProduct(l.productId)); });
+    saveCart();
+    renderCart();
   }
 
-  function setCart(c) {
-    cart = c || null;
-    var items = cart && cart.lineItems || [];
-    var count = items.reduce(function (s, li) { return s + lineQty(li); }, 0);
+  function renderCart() {
+    var count = cart.reduce(function (s, l) { return s + l.qty; }, 0);
     var badge = $("bag-count");
     badge.textContent = count;
     badge.classList.toggle("show", count > 0);
     var body = $("cart-body");
-    if (!items.length) {
-      body.innerHTML = '<div class="cart-empty"><span class="script">Tu cesta está vacía</span><p>Descubre nuestras piezas hechas a mano.</p></div>';
+    if (!cart.length) {
+      body.innerHTML = '<div class="cart-empty"><span class="script">Tu pedido está vacío</span><p>Pedido mínimo ' + esc(money(MIN_ORDER)) + ' sin IVA.</p></div>';
       $("cart-foot").hidden = true;
       return;
     }
-    body.innerHTML = items.map(function (li) {
-      var name = li.name && (li.name.translated || li.name.original) || "";
-      var img = imgUrl(li.attributes && li.attributes.image && li.attributes.image.url);
-      var total = li.pricing && li.pricing.totalPrice && li.pricing.totalPrice.amount;
-      var q = lineQty(li);
-      var isProduct = li.catalogReference && li.catalogReference.appId === STORES_APP_ID;
-      var step = packOfItem(li.catalogReference && li.catalogReference.catalogItemId);
-      var less = q - step < step ? 0 : q - step;
-      var packNote = step > 1 ? "Pack de " + step + " · " + q + " unidades" : "";
-      var dl = [descLines(li), packNote].filter(Boolean).join(String.fromCharCode(10));
+    body.innerHTML = cart.map(function (l, i) {
+      var less = l.qty - l.pack < l.pack ? 0 : l.qty - l.pack;
+      var dl = [l.detalle, l.pack > 1 ? "Pack de " + l.pack + " · " + l.qty + " unidades" : ""].filter(Boolean).join(String.fromCharCode(10));
       return '<div class="line">' +
-        (img ? '<img src="' + esc(sized(img, 200)) + '" alt="">' : '<span></span>') +
-        '<div><div class="line-name">' + esc(name) + '</div>' +
+        (l.img ? '<img src="' + esc(sized(l.img, 200)) + '" alt="">' : "<span></span>") +
+        '<div><div class="line-name">' + esc(l.name) + "</div>" +
         (dl ? '<div class="line-desc">' + esc(dl) + "</div>" : "") +
-        '<div class="qty"><button type="button" data-line="' + esc(li.id) + '" data-q="' + less + '" aria-label="Quitar">−</button><span>' + q + '</span><button type="button" data-line="' + esc(li.id) + '" data-q="' + (q + step) + '" aria-label="Añadir">+</button></div>' +
-        '<button type="button" class="remove" data-remove="' + esc(li.id) + '">Eliminar</button></div>' +
-        '<div class="line-price">' + esc(money(isProduct ? net(total) : total, cart.currency || "EUR")) + "</div></div>";
+        '<div class="line-desc">' + esc(money(l.unit)) + " / ud. sin IVA</div>" +
+        '<div class="qty"><button type="button" data-line="' + i + '" data-q="' + less + '" aria-label="Quitar">−</button><span>' + l.qty + '</span><button type="button" data-line="' + i + '" data-q="' + (l.qty + l.pack) + '" aria-label="Añadir">+</button></div>' +
+        '<button type="button" class="remove" data-remove="' + i + '">Eliminar</button></div>' +
+        '<div class="line-price">' + esc(money(round2(l.unit * l.qty))) + "</div></div>";
     }).join("");
-    var sub = Number(cart.subtotal && (cart.subtotal.amount || cart.subtotal.convertedAmount)) || 0;
-    var vat = items.reduce(function (s, li) {
-      var isProduct = li.catalogReference && li.catalogReference.appId === STORES_APP_ID;
-      return s + (isProduct ? vatOf(li.pricing && li.pricing.totalPrice && li.pricing.totalPrice.amount || 0) : 0);
-    }, 0);
-    vat = Math.round(vat * 100) / 100;
-    $("cart-subtotal").textContent = money(sub, cart.currency || "EUR");
-    $("cart-vat").textContent = money(vat, cart.currency || "EUR");
-    $("cart-total").textContent = money(Math.round((sub + vat) * 100) / 100, cart.currency || "EUR");
+    var total = cartTotal();
+    var missing = round2(MIN_ORDER - total);
+    $("cart-subtotal").textContent = money(total);
+    $("cart-min").hidden = missing <= 0;
+    $("cart-min").innerHTML = "Pedido mínimo " + esc(money(MIN_ORDER)) + " sin IVA. Te faltan <strong>" + esc(money(missing)) + "</strong>.";
+    $("cart-bar").style.setProperty("--p", Math.min(1, total / MIN_ORDER));
+    $("checkout").disabled = missing > 0;
     $("cart-foot").hidden = false;
-  }
-
-  function loadCart() {
-    if (!tokens || !tokens.refresh) { setCart(null); return Promise.resolve(); }
-    return api("GET", "/ecom/v2/carts/current").then(function (d) { setCart(d.cart); })
-      .catch(function () { setCart(null); });
   }
 
   $("cart-body").addEventListener("click", function (e) {
     var q = e.target.closest("[data-q]");
     var rm = e.target.closest("[data-remove]");
-    var req = null;
     if (q) {
+      var i = Number(q.getAttribute("data-line"));
       var n = Number(q.getAttribute("data-q"));
-      var id = q.getAttribute("data-line");
-      req = n < 1
-        ? api("POST", "/ecom/v2/carts/current/remove-line-items", { lineItemIds: [id] })
-        : api("POST", "/ecom/v2/carts/current/update-line-items", { lineItems: [{ lineItemId: id, quantity: { newQuantity: n } }] });
+      if (n < 1) cart.splice(i, 1); else cart[i].qty = Math.min(9999, n);
     } else if (rm) {
-      req = api("POST", "/ecom/v2/carts/current/remove-line-items", { lineItemIds: [rm.getAttribute("data-remove")] });
-    }
-    if (!req) return;
-    $("cart-body").style.opacity = ".55";
-    req.then(function (d) { setCart(d.cart); })
-      .catch(function () { toast("No se ha podido actualizar la cesta."); })
-      .then(function () { $("cart-body").style.opacity = ""; });
+      cart.splice(Number(rm.getAttribute("data-remove")), 1);
+    } else return;
+    saveCart();
+    renderCart();
   });
 
+  /* ---------------- alta de cliente mayorista ---------------- */
+  var reg = null;
+  try { reg = JSON.parse(localStorage.getItem(REG_KEY) || "null"); } catch (e) { reg = null; }
+
+  function setErrors(form, fields) {
+    form.querySelectorAll("[data-err]").forEach(function (el) {
+      var k = el.getAttribute("data-err");
+      el.textContent = fields && fields[k] || "";
+      var input = form.querySelector('[name="' + k + '"]');
+      if (input) input.setAttribute("aria-invalid", fields && fields[k] ? "true" : "false");
+    });
+  }
+
+  // Envía al servidor y, si no hay clave de Resend, reenvía con FormSubmit.
+  function send(payload) {
+    return fetch("/api/mayoristas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (out) {
+        if (!r.ok || !out.ok) { var err = new Error(out.error || "No se ha podido enviar."); err.fields = out.fields; throw err; }
+        if (out.relay !== "formsubmit") return out;
+        var fd = new FormData();
+        fd.append("_subject", out.subject);
+        fd.append("_template", "table");
+        fd.append("_captcha", "false");
+        fd.append("_replyto", payload.cliente.email);
+        out.rows.forEach(function (row) { fd.append(row[0], row[1] || "—"); });
+        return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(out.to), { method: "POST", headers: { Accept: "application/json" }, body: fd })
+          .then(function (r2) { return r2.json().catch(function () { return {}; }); })
+          .then(function (fs) {
+            if (String(fs.success) === "true") return out;
+            throw new Error(/activ/i.test(fs.message || "")
+              ? "Estamos terminando de activar los envíos. Mientras tanto, escríbenos a " + CONTACT.email + " o llámanos al " + CONTACT.phoneDisplay + "."
+              : "No se ha podido enviar. Inténtalo de nuevo o escríbenos a " + CONTACT.email + ".");
+          });
+      });
+    }, function () { throw new Error("No hay conexión. Comprueba tu red e inténtalo de nuevo."); });
+  }
+
+  function readForm(form) {
+    var f = form.elements;
+    return {
+      empresa: f.empresa.value.trim(), nombre: f.nombre.value.trim(), email: f.email.value.trim(),
+      telefono: f.telefono.value.trim(), nif: normId(f.nif.value), dni: normId(f.dni.value),
+      nifIva: normId(f.nifIva.value), privacidad: f.privacidad.checked
+    };
+  }
+
+  function showGate() {
+    var g = $("gate");
+    g.hidden = false;
+    document.body.classList.add("locked");
+    var form = $("gate-form");
+    if (reg) Object.keys(reg).forEach(function (k) {
+      var el = form.elements[k];
+      if (!el) return;
+      if (el.type === "checkbox") el.checked = !!reg[k]; else el.value = reg[k];
+    });
+    setTimeout(function () { form.elements.empresa.focus(); }, 60);
+  }
+  function hideGate() {
+    $("gate").hidden = true;
+    document.body.classList.remove("locked");
+    renderWho();
+  }
+  function renderWho() {
+    $("who").innerHTML = reg ? "Comprando como <strong>" + esc(reg.empresa) + "</strong> · NIF " + esc(reg.nif) + ' · <button type="button" id="who-edit">Cambiar datos</button>' : "";
+  }
+  document.addEventListener("click", function (e) {
+    if (e.target.closest("#who-edit")) showGate();
+  });
+
+  $("gate-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var form = this;
+    var data = readForm(form);
+    var errs = validateRegistro(data);
+    setErrors(form, errs);
+    var msg = $("gate-msg");
+    msg.textContent = "";
+    if (Object.keys(errs).length) {
+      var first = form.querySelector('[aria-invalid="true"]');
+      if (first) first.focus();
+      return;
+    }
+    var btn = $("gate-send");
+    btn.disabled = true;
+    msg.textContent = "Enviando tus datos…";
+    send({ tipo: "registro", cliente: data, website2: form.elements.website2.value }).then(function () {
+      reg = data;
+      try { localStorage.setItem(REG_KEY, JSON.stringify(reg)); } catch (e2) {}
+      msg.textContent = "";
+      hideGate();
+      toast("¡Bienvenido! Ya puedes hacer tu pedido.");
+    }).catch(function (err) {
+      setErrors(form, err.fields || {});
+      msg.textContent = err.message;
+    }).then(function () { btn.disabled = false; });
+  });
+
+  /* ---------------- enviar pedido ---------------- */
   $("checkout").addEventListener("click", function () {
-    if (!cart || !cart.id) return;
+    if (!cart.length || cartTotal() < MIN_ORDER) return;
+    if (!reg) { closeLayers(); showGate(); return; }
     var btn = $("checkout");
     btn.disabled = true;
-    api("POST", "/ecom/v2/carts/" + encodeURIComponent(cart.id) + "/get-checkout-url", {}).then(function (d) {
-      if (!d.checkoutUrl) throw new Error("sin url");
-      window.location.href = d.checkoutUrl;
-    }).catch(function () {
+    $("cart-msg").textContent = "Enviando tu pedido…";
+    send({
+      tipo: "pedido",
+      cliente: reg,
+      notas: $("cart-notes").value.trim(),
+      lineas: cart.map(function (l) { return { productId: l.productId, detalle: l.detalle, qty: l.qty }; })
+    }).then(function (out) {
+      cart = [];
+      saveCart();
+      renderCart();
+      $("cart-notes").value = "";
+      $("cart-msg").textContent = "";
+      $("cart-body").innerHTML = '<div class="cart-empty"><span class="script">¡Pedido recibido!</span><p>Referencia <strong>' + esc(out.ref || "") + "</strong> · " + esc(money(out.subtotal || 0)) + " sin IVA.</p><p>Te escribiremos a " + esc(reg.email) + " para confirmar el pedido, el envío y la forma de pago.</p></div>";
+    }).catch(function (err) {
+      $("cart-msg").textContent = err.message;
       btn.disabled = false;
-      toast("No se ha podido abrir el pago. Llámanos al " + CONTACT.phoneDisplay + " o escríbenos a " + CONTACT.email);
     });
-  });
-
-  /* ---------------- tarjeta regalo ---------------- */
-  var GIFT_APP_ID = "d80111c5-a0f4-47a8-b63a-65b54d774a27";
-  // Copia de la tarjeta creada en Wix, por si la consulta en directo no responde.
-  var gift = {
-    id: "5ea526f8-dd14-40bb-952d-e20812c0ff3f",
-    description: "",
-    expirationType: "NONE",
-    presetVariants: [
-      { id: "647602a9-f447-485b-9c66-924f30ab5ff0", price: { amount: "25" }, value: { amount: "25" } },
-      { id: "a9f0412e-e17a-4c60-965f-e368deeaf61a", price: { amount: "50" }, value: { amount: "50" } },
-      { id: "f71bf7e3-4184-4084-9f15-0b8c33fa6e00", price: { amount: "100" }, value: { amount: "100" } },
-      { id: "c8d9b683-e848-4d95-b08c-3dd9695e2cc5", price: { amount: "150" }, value: { amount: "150" } },
-      { id: "d47c107a-628b-483d-ab0f-ba8a1d9f0b5f", price: { amount: "200" }, value: { amount: "200" } }
-    ]
-  };
-  var giftPicked = null;
-
-  function giftVariant() {
-    var list = gift.presetVariants || [];
-    for (var i = 0; i < list.length; i++) if (list[i].id === giftPicked) return list[i];
-    return null;
-  }
-  function renderGift() {
-    var list = gift.presetVariants || [];
-    $("gc-amounts").innerHTML = list.map(function (v) {
-      var val = v.value && v.value.amount;
-      var price = v.price && v.price.amount;
-      var extra = price && val && Number(price) < Number(val) ? "<small>pagas " + esc(money(price)) + "</small>" : "";
-      return '<button type="button" class="gift-amt" data-gc="' + esc(v.id) + '" aria-pressed="' + (giftPicked === v.id) + '">' + esc(money(val)) + extra + "</button>";
-    }).join("");
-    var v = giftVariant();
-    $("gc-picked").textContent = v ? money(v.price && v.price.amount) : "";
-    $("gc-add").disabled = !v;
-    var note = $("gc-note");
-    note.classList.remove("error");
-    note.textContent = v ? "" : "Elige un importe.";
-    if (gift.description) $("gc-desc").textContent = gift.description.trim();
-    var exp = $("gc-expiry");
-    if (gift.expirationType === "NONE") exp.textContent = "Se canjea al pagar en nuestra tienda y no caduca.";
-    else exp.textContent = "Se canjea al pagar en nuestra tienda.";
-  }
-  function loadGift() {
-    renderGift();
-    return api("POST", "/gift-cards/v1/gift-card-products/query", { query: { cursorPaging: { limit: 1 } } }).then(function (data) {
-      var p = data.giftCardProducts && data.giftCardProducts[0];
-      if (!p || !p.presetVariants || !p.presetVariants.length) return;
-      gift = p;
-      if (!giftVariant()) giftPicked = null;
-      if (p.image && p.image.url) {
-        var name = p.image.url.split("/media/")[1];
-        if (name) $("gc-img").src = "https://static.wixstatic.com/media/" + name + "/v1/fit/w_1200,h_800,q_90,enc_auto/tarjeta-regalo.jpg";
-      }
-      renderGift();
-    }).catch(function () {});
-  }
-  $("gc-img").addEventListener("error", function () { this.style.display = "none"; });
-  $("gc-amounts").addEventListener("click", function (e) {
-    var b = e.target.closest("[data-gc]");
-    if (!b) return;
-    giftPicked = b.getAttribute("data-gc");
-    renderGift();
-  });
-  $("gc-add").addEventListener("click", function () {
-    var v = giftVariant();
-    if (!v) return;
-    var btn = $("gc-add");
-    btn.disabled = true;
-    $("gc-note").textContent = "Añadiendo…";
-    var body = {
-      catalogItems: [{
-        catalogReference: { catalogItemId: gift.id, appId: GIFT_APP_ID, options: { variantId: v.id } },
-        quantity: 1
-      }]
-    };
-    api("POST", "/ecom/v2/carts/current/add-line-items", body).then(function (data) {
-      setCart(data.cart);
-      $("gc-note").textContent = "";
-      openLayer("cart");
-      var badge = $("bag-count");
-      badge.classList.remove("bump");
-      void badge.offsetWidth;
-      badge.classList.add("bump");
-    }).catch(function () {
-      $("gc-note").textContent = "No se ha podido añadir. Inténtalo de nuevo en unos segundos.";
-      $("gc-note").classList.add("error");
-    }).then(function () { btn.disabled = !giftVariant(); });
   });
 
   /* ---------------- búsqueda ---------------- */
@@ -1067,6 +1076,7 @@ applyContact();
     document.getElementById("colecciones").scrollIntoView();
     openProduct(wanted[1]);
   }
-  loadGift();
-  loadCart();
+  renderCart();
+  renderWho();
+  if (!reg) showGate();
 })();
