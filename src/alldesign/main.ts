@@ -423,7 +423,6 @@ const CATALOG = [
   { t: 'Letra de resina iluminada', c: '45,00 € + IVA', href: '/alldesign-karl/tienda/#p=2435d64f-e41d-4995-b730-f3a8cc13ed5a' },
   { t: 'Letra decorada personalizada', c: '39,00 € + IVA', href: '/alldesign-karl/tienda/#p=1ae0ea11-9aec-46e5-b2a1-33d8ce70b33b' },
   { t: 'Ambientador del Cachirulo', c: 'Pack de 5 · 54,90 € + IVA', href: '/alldesign-karl/tienda/#p=f4d56313-6834-4f16-93d0-f07d02b35f0a' },
-  { t: 'Tarjeta regalo', c: 'De 25 € a 200 €', href: '/alldesign-karl/tienda/#tarjeta-regalo' },
   { t: 'Tienda online', c: 'Todas las piezas', href: '/alldesign-karl/tienda/' },
   { t: 'Solicitar presupuesto', c: 'Empresas y pedidos grandes', href: '/alldesign-karl/presupuesto/' },
 ]
