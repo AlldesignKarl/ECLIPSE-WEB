@@ -323,7 +323,7 @@ form.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(d),
     });
-    const out = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; fields?: Record<string, string>; relay?: string; to?: string; subject?: string; when?: string; saved?: boolean };
+    const out = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; fields?: Record<string, string>; relay?: string; to?: string; subject?: string; when?: string; saved?: boolean; cc?: string };
     if (!res.ok || !out.ok) {
       if (out.fields) {
         const fields = out.fields;
@@ -335,7 +335,7 @@ form.addEventListener('submit', async (e) => {
       return;
     }
     if (out.relay === 'formsubmit') {
-      const sent = await relayFormSubmit(d, out.to!, out.subject!, out.when!);
+      const sent = await relayFormSubmit(d, out.to!, out.subject!, out.when!, out.cc);
       // Si el correo falla pero la solicitud quedó guardada en el servidor, ha llegado.
       if (sent !== true && !out.saved) {
         fail(sent);
@@ -352,12 +352,13 @@ form.addEventListener('submit', async (e) => {
 
 // Envio con FormSubmit desde el navegador (sin clave). La primera vez
 // FormSubmit manda al correo de destino un email para activar el formulario.
-async function relayFormSubmit(d: QuotePayload, to: string, subject: string, when: string): Promise<true | string> {
+async function relayFormSubmit(d: QuotePayload, to: string, subject: string, when: string, cc?: string): Promise<true | string> {
   const fd = new FormData();
   fd.append('_subject', subject);
   fd.append('_template', 'table');
   fd.append('_captcha', 'false');
   fd.append('_replyto', d.email);
+  if (cc) fd.append('_cc', cc);
   const fecha = d.fecha ? new Date(`${d.fecha}T12:00:00`).toLocaleDateString('es-ES', { dateStyle: 'long' }) : '';
   const rows: [string, string][] = [
     ['Nombre', d.nombre],

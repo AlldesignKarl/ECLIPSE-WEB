@@ -16,6 +16,7 @@
     "@vercel/blob": "^2.7.0",
     "gsap": "^3.15.0",
     "lenis": "^1.3.26",
+    "nodemailer": "^6.9.16",
     "postprocessing": "^6.37.8",
     "react": "~19.2.8",
     "react-dom": "~19.2.8",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.20.4",
+    "@types/nodemailer": "^6.4.17",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@types/three": "^0.186.0",

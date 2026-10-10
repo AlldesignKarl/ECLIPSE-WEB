@@ -1,15 +1,9 @@
 // Solicitudes de presupuesto de Alldesign Karl.
 //
 // Funcion serverless de Vercel (POST /api/presupuesto). Recibe el formulario
-// en JSON, lo valida otra vez (nunca se confia en el navegador) y lo envia por
-// email con Resend (https://resend.com). La clave solo existe aqui, en el
-// servidor, a traves de variables de entorno:
-//
-//   RESEND_API_KEY   clave de la API de Resend (obligatoria)
-//   EMAIL_TO         a quien llegan las solicitudes (por defecto alldesignkarl@gmail.com)
-//   EMAIL_FROM       remitente; sin dominio propio verificado en Resend hay que
-//                    usar "Alldesign Karl <onboarding@resend.dev>" (valor por
-//                    defecto), que solo puede enviar al email de la cuenta de Resend
+// en JSON, lo valida otra vez (nunca se confia en el navegador), guarda una
+// copia en el panel y lo envia por email (ver api/_email.ts: Gmail, Resend o
+// FormSubmit). Las claves solo existen aqui, en variables de entorno.
 //   EMAIL_DRY_RUN=1  no envia nada: escribe el email en el registro (pruebas)
 
 import {
@@ -22,6 +16,7 @@ import {
   type QuotePayload,
 } from '../src/alldesign/quote-config.js';
 import { saveRecord } from './_store.js';
+import { sendEmail, hasMailer, recipients } from './_email.js';
 
 // Variables de entorno de Vercel. Se declara aqui para no depender de los
 // tipos de Node al compilar la funcion.
@@ -179,11 +174,10 @@ export async function POST(request: Request): Promise<Response> {
 
   const when = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'long', timeStyle: 'short' });
   const mail = buildEmail(p, files, when);
-  const to = process.env.EMAIL_TO || 'alldesignkarl@gmail.com';
-  const from = process.env.EMAIL_FROM || 'Alldesign Karl <onboarding@resend.dev>';
+  const [to, ...cc] = recipients();
 
   if (process.env.EMAIL_DRY_RUN === '1') {
-    console.log(`[presupuesto] (prueba, no se envia) a ${to}\nAsunto: ${mail.subject}\n\n${mail.text}\nAdjuntos: ${files.length}`);
+    console.log(`[presupuesto] (prueba, no se envia) a ${recipients().join(', ')}\nAsunto: ${mail.subject}\n\n${mail.text}\nAdjuntos: ${files.length}`);
     return json(200, { ok: true, dryRun: true });
   }
 
@@ -191,29 +185,19 @@ export async function POST(request: Request): Promise<Response> {
   const ref = `P-${Date.now().toString(36).toUpperCase()}`;
   const saved = await saveRecord('presupuestos', ref, { subject: mail.subject, text: mail.text, archivos: files.map((f) => `${f.name} (${kb(f.size)})`) });
 
-  const key = process.env.RESEND_API_KEY;
-  // Sin clave de Resend, el envio lo hace el navegador con FormSubmit, que
+  // Sin Gmail ni Resend, el envio lo hace el navegador con FormSubmit, que
   // rechaza las peticiones que salen de servidores. Aqui ya se ha validado todo.
-  if (!key) return json(200, { ok: true, relay: 'formsubmit', to, subject: mail.subject, when, saved });
+  if (!hasMailer()) return json(200, { ok: true, relay: 'formsubmit', to, cc: cc.join(','), subject: mail.subject, when, saved });
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from,
-      to: [to],
-      reply_to: p.email,
-      subject: mail.subject,
-      text: mail.text,
-      html: mail.html,
-      attachments: files.map((f) => ({ filename: f.name, content: f.data })),
-    }),
+  const sent = await sendEmail({
+    subject: mail.subject,
+    html: mail.html,
+    text: mail.text,
+    replyTo: p.email,
+    attachments: files.map((f) => ({ filename: f.name, content: f.data })),
   });
-
-  if (!res.ok) {
-    console.error('[presupuesto] Resend respondio', res.status, await res.text().catch(() => ''));
+  if (!sent && !saved)
     return json(502, { ok: false, error: 'No hemos podido enviar la solicitud. Inténtalo de nuevo en unos minutos o escríbenos a alldesignkarl@gmail.com.' });
-  }
   return json(200, { ok: true });
 }
 

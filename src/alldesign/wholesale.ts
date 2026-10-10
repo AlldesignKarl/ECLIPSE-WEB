@@ -79,7 +79,7 @@ export function validateRegistro(r: Registro): Record<string, string> {
   return e;
 }
 
-type SnapProduct = { id: string; name: string; ribbon?: { name?: string }; actualPriceRange?: { minValue?: { amount?: string } } };
+type SnapProduct = { id: string; name: string; ribbon?: { name?: string }; actualPriceRange?: { minValue?: { amount?: string } }; media?: { main?: { image?: { url?: string } } } };
 
 /** Unidades por pack (los ambientadores se venden de 5 en 5). */
 export function packSize(p: SnapProduct | undefined): number {
@@ -88,10 +88,11 @@ export function packSize(p: SnapProduct | undefined): number {
 }
 
 /** Precios sin IVA por producto, de la copia de Wix (se pueden sustituir por los de Wix en directo). */
-export function snapshotPrices(): Record<string, { name: string; unit: number; pack: number }> {
-  const out: Record<string, { name: string; unit: number; pack: number }> = {};
+export type PriceInfo = { name: string; unit: number; pack: number; img: string };
+export function snapshotPrices(): Record<string, PriceInfo> {
+  const out: Record<string, PriceInfo> = {};
   for (const p of SNAPSHOT as SnapProduct[]) {
-    out[p.id] = { name: p.name.trim(), unit: Number(p.actualPriceRange?.minValue?.amount ?? 0), pack: packSize(p) };
+    out[p.id] = { name: p.name.trim(), unit: Number(p.actualPriceRange?.minValue?.amount ?? 0), pack: packSize(p), img: p.media?.main?.image?.url ?? '' };
   }
   return out;
 }

@@ -804,6 +804,7 @@ applyContact();
         fd.append("_template", "table");
         fd.append("_captcha", "false");
         fd.append("_replyto", payload.cliente.email);
+        if (out.cc) fd.append("_cc", out.cc);
         out.rows.forEach(function (row) { fd.append(row[0], row[1] || "—"); });
         return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(out.to), { method: "POST", headers: { Accept: "application/json" }, body: fd })
           .then(function (r2) { return r2.json().catch(function () { return {}; }); }, function () { return {}; })
@@ -906,7 +907,7 @@ applyContact();
       renderCart();
       $("cart-notes").value = "";
       $("cart-msg").textContent = "";
-      $("cart-body").innerHTML = '<div class="cart-empty"><span class="script">¡Pedido recibido!</span><p>Referencia <strong>' + esc(out.ref || "") + "</strong> · " + esc(money(out.subtotal || 0)) + " sin IVA.</p><p>Te escribiremos a " + esc(reg.email) + " para confirmar el pedido, el envío y la forma de pago.</p></div>";
+      $("cart-body").innerHTML = '<div class="cart-empty"><span class="script">¡Pedido enviado!</span><p>Referencia <strong>' + esc(out.ref || "") + "</strong> · " + esc(money(out.subtotal || 0)) + " sin IVA.</p><p>Te escribiremos a " + esc(reg.email) + " para confirmar el pedido, el envío y la forma de pago.</p></div>";
     }).catch(function (err) {
       $("cart-msg").textContent = err.fields ? err.message : err.message + " Tu pedido sigue guardado en la cesta.";
       btn.disabled = false;

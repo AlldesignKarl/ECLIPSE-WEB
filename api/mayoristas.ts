@@ -21,6 +21,7 @@ import {
   type Registro,
 } from '../src/alldesign/wholesale.js';
 import { saveRecord, listRecords, isAdmin, type Kind } from './_store.js';
+import { sendEmail, hasMailer, recipients, orderEmail, type OrderLine } from './_email.js';
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -61,7 +62,12 @@ async function prices() {
       const unit = Number(p.actualPriceRange?.minValue?.amount);
       if (!p.id || !isFinite(unit) || unit <= 0) continue;
       const pack = /pack de (\d+)/i.exec(p.ribbon?.name ?? '');
-      snap[p.id] = { name: String(p.name).trim(), unit, pack: pack ? Number(pack[1]) : snap[p.id]?.pack ?? 1 };
+      snap[p.id] = {
+        name: String(p.name).trim(),
+        unit,
+        pack: pack ? Number(pack[1]) : snap[p.id]?.pack ?? 1,
+        img: p.media?.main?.image?.url || snap[p.id]?.img || '',
+      };
     }
   } catch {
     /* se usa la copia */
@@ -102,36 +108,31 @@ function html(title: string, rows: [string, string][]) {
   return `<!doctype html><html><body style="margin:0;background:#f1ebe1;padding:32px 16px;font-family:Georgia,serif;color:#1c1a17"><div style="max-width:640px;margin:0 auto;background:#fbf8f2;border:1px solid #e3d8c6;padding:32px"><p style="margin:0 0 6px;font:500 11px Helvetica,Arial,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#7a6d5f">Alldesign Karl · Mayoristas</p><h1 style="margin:0 0 20px;font-weight:400;font-size:24px">${esc(title)}</h1><table style="border-collapse:collapse">${tr}</table></div></body></html>`;
 }
 
-async function deliver(kind: Kind, ref: string, subject: string, rows: [string, string][], replyTo: string, extra: Record<string, unknown>) {
-  const to = process.env.EMAIL_TO || 'alldesignkarl@gmail.com';
-  const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n');
+async function deliver(
+  kind: Kind,
+  ref: string,
+  subject: string,
+  rows: [string, string][],
+  replyTo: string,
+  extra: Record<string, unknown>,
+  mail?: { html: string; text: string },
+) {
+  const text = mail?.text ?? rows.map(([k, v]) => `${k}: ${v}`).join('\n');
   // Primero se guarda: aunque el correo falle, queda en el panel de pedidos.
   const saved = await saveRecord(kind, ref, { subject, rows });
   extra = { ...extra, saved };
   if (process.env.EMAIL_DRY_RUN === '1') {
-    console.log(`[mayoristas] (prueba) a ${to}\nAsunto: ${subject}\n\n${text}`);
+    console.log(`[mayoristas] (prueba) a ${recipients().join(', ')}\nAsunto: ${subject}\n\n${text}`);
     return json(200, { ok: true, dryRun: true, ...extra });
   }
-  const key = process.env.RESEND_API_KEY;
-  // Sin clave de Resend lo reenvia el navegador con FormSubmit (ya validado aqui).
-  if (!key) return json(200, { ok: true, relay: 'formsubmit', to, subject, rows, ...extra });
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: process.env.EMAIL_FROM || 'Alldesign Karl <onboarding@resend.dev>',
-      to: [to],
-      reply_to: replyTo,
-      subject,
-      text,
-      html: html(subject, rows),
-    }),
-  });
-  if (!res.ok) {
-    console.error('[mayoristas] Resend respondio', res.status, await res.text().catch(() => ''));
-    return json(502, { ok: false, error: 'No hemos podido enviarlo. Inténtalo de nuevo o escríbenos a alldesignkarl@gmail.com.' });
+  if (hasMailer()) {
+    const sent = await sendEmail({ subject, html: mail?.html ?? html(subject, rows), text, replyTo });
+    if (sent || saved) return json(200, { ok: true, emailed: sent, ...extra });
+    return json(502, { ok: false, error: 'No hemos podido enviarlo. Inténtalo de nuevo en unos minutos.' });
   }
-  return json(200, { ok: true, ...extra });
+  // Sin Gmail ni Resend configurados, el navegador lo reenvia con FormSubmit.
+  const [to, ...cc] = recipients();
+  return json(200, { ok: true, relay: 'formsubmit', to, cc: cc.join(','), subject, rows, ...extra });
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -160,7 +161,7 @@ export async function POST(request: Request): Promise<Response> {
   const raw = Array.isArray(body.lineas) ? body.lineas.slice(0, 50) : [];
   if (!raw.length) return json(422, { ok: false, error: 'Tu pedido está vacío.' });
   const table = await prices();
-  const lines: (Linea & { unit: number; total: number })[] = [];
+  const lines: (Linea & OrderLine)[] = [];
   for (const l of raw as Record<string, unknown>[]) {
     const id = clean(l.productId, 60);
     const p = table[id];
@@ -168,7 +169,7 @@ export async function POST(request: Request): Promise<Response> {
     if (!p) return json(422, { ok: false, error: 'Uno de los productos ya no está disponible. Revisa tu pedido.' });
     if (!(qty >= 1 && qty <= 9999)) return json(422, { ok: false, error: 'Revisa las cantidades.' });
     if (qty % p.pack) return json(422, { ok: false, error: `${p.name} se vende en packs de ${p.pack} unidades.` });
-    lines.push({ productId: id, name: p.name, detalle: clean(l.detalle, 300), qty, unit: p.unit, total: round2(p.unit * qty) });
+    lines.push({ productId: id, name: p.name, detalle: clean(l.detalle, 300), qty, unit: p.unit, total: round2(p.unit * qty), img: p.img, pack: p.pack });
   }
   const subtotal = round2(lines.reduce((s, l) => s + l.total, 0));
   if (subtotal < MIN_ORDER)
@@ -187,10 +188,18 @@ export async function POST(request: Request): Promise<Response> {
     ['Observaciones', clean(body.notas, 1000) || '—'],
     ['Fecha del pedido', when],
   ];
-  return deliver('pedidos', ref, `Nuevo pedido mayorista ${ref} - ${cliente.empresa} - ${eur(subtotal)}`, rows, cliente.email, {
+  const notas = clean(body.notas, 1000);
+  const units = lines.reduce((n, l) => n + l.qty, 0);
+  const mail = orderEmail({ ref, when, cliente, lines, subtotal, notas, eur });
+  return deliver(
+    'pedidos',
     ref,
-    subtotal,
-  });
+    `Nuevo pedido ${ref} · ${cliente.empresa} · ${units} uds. · ${eur(subtotal)}`,
+    rows,
+    cliente.email,
+    { ref, subtotal },
+    mail,
+  );
 }
 
 // Panel de pedidos: GET /api/mayoristas con la cabecera x-admin-key.
