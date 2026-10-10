@@ -13,6 +13,8 @@
     <meta property="og:title" content="Tienda — Alldesign Karl" />
     <link rel="preconnect" href="https://www.wixapis.com" />
     <link rel="preconnect" href="https://static.wixstatic.com" />
+    <link rel="preload" as="image" href="https://static.wixstatic.com/media/43eaa1_72cd58cd4eda4174852a42b5db8ec470~mv2.jpg" media="(min-width: 761px)" />
+    <link rel="preload" as="image" href="https://static.wixstatic.com/media/43eaa1_3dab28e9c2ca4bb4af2c54a9abb19aa0~mv2.jpg" media="(max-width: 760px)" />
     <link rel="preload" href="/alldesign-karl/fonts/cormorant-garamond-normal-latin-2fed1d.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/alldesign-karl/fonts/pinyon-script-normal-latin-cfbbdd.woff2" as="font" type="font/woff2" crossorigin />
   </head>
@@ -37,6 +39,7 @@
     <nav class="nav" aria-label="Principal">
       <a href="/alldesign-karl/">Inicio</a>
       <a href="#colecciones" aria-current="page">Tienda</a>
+      <a href="#nosotros">Sobre nosotros</a>
       <a href="#tarjeta-regalo">Tarjeta regalo</a>
       <a href="/alldesign-karl/presupuesto/">Empresas</a>
       <a href="#contacto">Contacto</a>
@@ -50,14 +53,25 @@
 </header>
 
 <main>
-  <section class="shop-hero" id="inicio">
-    <div class="wrap">
-      <p class="caps reveal">Alldesign Karl · Tienda online</p>
-      <h1 class="reveal">La tienda</h1>
-      <p class="lead reveal">Piezas hechas a mano, una a una, en nuestro taller de Aragón. Elige la tuya, personalízala y te la enviamos a casa.</p>
-      <div class="ornament reveal" aria-hidden="true"><svg class="star"><use href="#i-star"/></svg></div>
-      <p class="perks reveal"><span><svg><use href="#i-star"/></svg>Hecho a mano</span><span><svg><use href="#i-star"/></svg>Envío gratis</span><span><svg><use href="#i-star"/></svg>Pago seguro</span></p>
+  <section class="hero" id="inicio">
+    <div class="hero-parallax" id="parallax"><div class="hero-float"><div class="hero-bg"></div></div></div>
+    <div class="hero-veil"></div>
+    <div class="hero-shimmer"></div>
+    <div class="motes" id="motes" aria-hidden="true"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow caps fade d1"><span>Porcelana</span><span class="dot">·</span><span>Arte</span><span class="dot">·</span><span>Tradición</span></p>
+      <h1 class="hero-title" id="hero-title" aria-label="Alldesign Karl">Alldesign Karl</h1>
+      <div class="ornament hero-divider" aria-hidden="true"><svg class="star"><use href="#i-star"/></svg></div>
+      <p class="hero-tagline fade d2">La belleza de lo artesanal,<br>en cada detalle.</p>
+      <a class="pill caps fade d3" href="#colecciones">Descubre nuestras colecciones <svg class="arrow"><use href="#i-arrow"/></svg></a>
     </div>
+    <div class="hero-foot fade d4">
+      <div class="wrap">
+        <p class="corner caps">Hecho a mano<br>en Aragón</p>
+        <p class="corner right">Cada pieza<br>cuenta una historia</p>
+      </div>
+    </div>
+    <a class="scroll-cue fade d4" href="#colecciones" aria-label="Ir a las colecciones"><span class="rule"></span><svg class="star"><use href="#i-star"/></svg></a>
   </section>
 
   <section class="shop sec" id="colecciones">
@@ -77,6 +91,26 @@
       </div>
     </div>
   </section>
+  <section class="story sec" id="nosotros">
+    <div class="wrap">
+      <div class="story-grid">
+        <div class="story-art reveal"><div class="story-frame" role="img" aria-label="Fragmento de porcelana pintada a mano en azul con borde dorado"></div></div>
+        <div class="story-copy">
+          <p class="caps reveal">Sobre nosotros</p>
+          <h2 class="reveal">Cada pieza cuenta una historia</h2>
+          <p class="reveal">En Alldesign Karl creemos en el valor de lo hecho despacio. Cada pieza nace en nuestro taller de Aragón y se pinta a mano, trazo a trazo, inspirada en la tradición de la porcelana azul y blanca.</p>
+          <p class="reveal">Ninguna es idéntica a otra: sus pequeñas diferencias son la huella de las manos que la crearon, y lo que la convierte en única.</p>
+          <p class="sign reveal">Alldesign Karl</p>
+        </div>
+      </div>
+      <div class="values">
+        <div class="value reveal"><svg><use href="#i-hand"/></svg><h3>Hecho a mano</h3><p>Creado y pintado en nuestro taller, pieza a pieza.</p></div>
+        <div class="value reveal"><svg><use href="#i-flower"/></svg><h3>Piezas únicas</h3><p>Cada trazo es irrepetible: no hay dos iguales.</p></div>
+        <div class="value reveal"><svg><use href="#i-shield"/></svg><h3>Compra segura</h3><p>Pago protegido con la plataforma segura de Wix.</p></div>
+      </div>
+    </div>
+  </section>
+
   <section class="sec" style="padding-top:0">
     <div class="wrap">
       <div class="shop-b2b reveal">

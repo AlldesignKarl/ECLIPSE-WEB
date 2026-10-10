@@ -7,6 +7,9 @@
 // navegador. El pago se hace en la página segura de Wix.
 import './shop.css';
 import { CONTACT, applyContact } from './contact';
+// Copia de los productos de Wix (10/10/2026): se ven al instante y siguen
+// viéndose si Wix tarda en responder. Al cargar, se sustituyen por los de Wix.
+import SNAPSHOT from './shop-products.json';
 
 applyContact();
 
@@ -235,8 +238,15 @@ applyContact();
     observeReveals($("grid"));
   }
 
+  function showProducts(list) {
+    products = list;
+    $("empty").hidden = true;
+    renderToolbar();
+    renderGrid();
+  }
+
   function loadProducts() {
-    skeleton();
+    showProducts(SNAPSHOT.slice());
     var body = {
       query: { cursorPaging: { limit: 100 } },
       fields: ["CURRENCY", "PLAIN_DESCRIPTION", "MEDIA_ITEMS_INFO", "DIRECT_CATEGORIES_INFO"]
@@ -253,8 +263,7 @@ applyContact();
       renderToolbar();
       renderGrid();
     }).catch(function () {
-      $("grid").innerHTML = "";
-      $("empty").hidden = false;
+      // Sin respuesta de Wix se quedan los productos de la copia.
     });
   }
 
@@ -956,6 +965,58 @@ applyContact();
   });
 
   /* ---------------- animaciones ---------------- */
+  // Título letra a letra, como tinta que aparece.
+  (function () {
+    var t = $("hero-title");
+    var text = t.textContent;
+    t.textContent = "";
+    var i = 0;
+    text.split("").forEach(function (ch) {
+      var s = document.createElement("span");
+      s.className = "ch";
+      s.setAttribute("aria-hidden", "true");
+      s.style.setProperty("--i", i++);
+      s.textContent = ch === " " ? String.fromCharCode(160) : ch;
+      t.appendChild(s);
+    });
+  })();
+
+  // Destellos dorados que suben lentamente.
+  if (!reduceMotion) {
+    var motes = $("motes");
+    var n = window.innerWidth < 760 ? 10 : 22;
+    for (var m = 0; m < n; m++) {
+      var d = document.createElement("span");
+      d.className = "mote";
+      var size = 2 + Math.random() * 4;
+      d.style.left = (Math.random() * 100) + "%";
+      d.style.width = size + "px";
+      d.style.height = size + "px";
+      d.style.animationDuration = (14 + Math.random() * 16) + "s";
+      d.style.animationDelay = (-Math.random() * 24) + "s";
+      d.style.setProperty("--dx", ((Math.random() - .5) * 120) + "px");
+      motes.appendChild(d);
+    }
+  }
+
+  // Paralaje suave con el ratón y con el scroll.
+  if (!reduceMotion) {
+    var par = $("parallax");
+    var mx = 0, my = 0, sy = 0;
+    function applyParallax() {
+      par.style.transform = "translate3d(" + (mx * -14) + "px," + (my * -10 + sy) + "px,0)";
+    }
+    window.addEventListener("mousemove", function (e) {
+      mx = e.clientX / window.innerWidth - .5;
+      my = e.clientY / window.innerHeight - .5;
+      applyParallax();
+    }, { passive: true });
+    window.addEventListener("scroll", function () {
+      sy = Math.min(window.scrollY, window.innerHeight) * .25;
+      applyParallax();
+    }, { passive: true });
+  }
+
   // Cabecera sólida al bajar y enlace activo según la sección.
   var header = $("header");
   var spyLinks = document.querySelectorAll("[data-spy]");
@@ -963,7 +1024,7 @@ applyContact();
     header.classList.toggle("solid", window.scrollY > 60);
     var pos = window.scrollY + window.innerHeight * .35;
     var currentId = "inicio";
-    ["colecciones", "tarjeta-regalo", "contacto"].forEach(function (id) {
+    ["colecciones", "nosotros", "tarjeta-regalo", "contacto"].forEach(function (id) {
       var s = $(id);
       if (s && s.offsetTop <= pos) currentId = id;
     });
