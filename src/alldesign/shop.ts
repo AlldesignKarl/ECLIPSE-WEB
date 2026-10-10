@@ -809,9 +809,8 @@ applyContact();
           .then(function (r2) { return r2.json().catch(function () { return {}; }); })
           .then(function (fs) {
             if (String(fs.success) === "true") return out;
-            throw new Error(/activ/i.test(fs.message || "")
-              ? "Estamos terminando de activar los envíos. Mientras tanto, escríbenos a " + CONTACT.email + " o llámanos al " + CONTACT.phoneDisplay + "."
-              : "No se ha podido enviar. Inténtalo de nuevo o escríbenos a " + CONTACT.email + ".");
+            // Pasa si el envío por correo aún no está activado en FormSubmit.
+            throw new Error("No hemos podido enviarlo en este momento. Inténtalo de nuevo en unos minutos.");
           });
       });
     }, function () { throw new Error("No hay conexión. Comprueba tu red e inténtalo de nuevo."); });
@@ -873,8 +872,18 @@ applyContact();
       hideGate();
       toast("¡Bienvenido! Ya puedes hacer tu pedido.");
     }).catch(function (err) {
-      setErrors(form, err.fields || {});
-      msg.textContent = err.message;
+      if (err.fields) {
+        setErrors(form, err.fields);
+        msg.textContent = err.message;
+        return;
+      }
+      // Los datos ya están comprobados: si el aviso por correo falla, el cliente
+      // entra igual. Sus datos completos van también en cada pedido.
+      reg = data;
+      try { localStorage.setItem(REG_KEY, JSON.stringify(reg)); } catch (e2) {}
+      msg.textContent = "";
+      hideGate();
+      toast("¡Bienvenido! Ya puedes hacer tu pedido.");
     }).then(function () { btn.disabled = false; });
   });
 
@@ -898,7 +907,7 @@ applyContact();
       $("cart-msg").textContent = "";
       $("cart-body").innerHTML = '<div class="cart-empty"><span class="script">¡Pedido recibido!</span><p>Referencia <strong>' + esc(out.ref || "") + "</strong> · " + esc(money(out.subtotal || 0)) + " sin IVA.</p><p>Te escribiremos a " + esc(reg.email) + " para confirmar el pedido, el envío y la forma de pago.</p></div>";
     }).catch(function (err) {
-      $("cart-msg").textContent = err.message;
+      $("cart-msg").textContent = err.fields ? err.message : err.message + " Tu pedido sigue guardado en la cesta.";
       btn.disabled = false;
     });
   });
