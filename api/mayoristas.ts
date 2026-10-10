@@ -131,9 +131,11 @@ async function deliver(
     if (sent || saved) return json(200, { ok: true, emailed: sent, ...extra });
     return json(502, { ok: false, error: 'No hemos podido enviarlo. Inténtalo de nuevo en unos minutos.' });
   }
-  // Sin Gmail ni Resend configurados, el navegador lo reenvia con FormSubmit.
-  const [to, ...cc] = recipients();
-  return json(200, { ok: true, relay: 'formsubmit', to, cc: cc.join(','), subject, rows: relayRows ?? rows, ...extra });
+  // Sin Gmail ni Resend configurados no se envia correo (FormSubmit daba
+  // problemas de activacion): el envio queda guardado en el panel de pedidos.
+  void relayRows;
+  if (saved) return json(200, { ok: true, emailed: false, ...extra });
+  return json(502, { ok: false, error: 'No hemos podido enviarlo. Inténtalo de nuevo en unos minutos.' });
 }
 
 export async function POST(request: Request): Promise<Response> {

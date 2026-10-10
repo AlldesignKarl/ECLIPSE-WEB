@@ -174,8 +174,6 @@ export async function POST(request: Request): Promise<Response> {
 
   const when = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'long', timeStyle: 'short' });
   const mail = buildEmail(p, files, when);
-  const [to, ...cc] = recipients();
-
   if (process.env.EMAIL_DRY_RUN === '1') {
     console.log(`[presupuesto] (prueba, no se envia) a ${recipients().join(', ')}\nAsunto: ${mail.subject}\n\n${mail.text}\nAdjuntos: ${files.length}`);
     return json(200, { ok: true, dryRun: true });
@@ -187,7 +185,10 @@ export async function POST(request: Request): Promise<Response> {
 
   // Sin Gmail ni Resend, el envio lo hace el navegador con FormSubmit, que
   // rechaza las peticiones que salen de servidores. Aqui ya se ha validado todo.
-  if (!hasMailer()) return json(200, { ok: true, relay: 'formsubmit', to, cc: cc.join(','), subject: mail.subject, when, saved });
+  if (!hasMailer()) {
+    if (saved) return json(200, { ok: true });
+    return json(502, { ok: false, error: 'No hemos podido enviar la solicitud. Inténtalo de nuevo en unos minutos o escríbenos a alldesignkarl@gmail.com.' });
+  }
 
   const sent = await sendEmail({
     subject: mail.subject,
