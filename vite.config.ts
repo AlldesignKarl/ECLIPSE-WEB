@@ -45,6 +45,7 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         alldesign: resolve(__dirname, 'alldesign-karl/index.html'),
         presupuesto: resolve(__dirname, 'alldesign-karl/presupuesto/index.html'),
+        tienda: resolve(__dirname, 'alldesign-karl/tienda/index.html'),
         privacidad: resolve(__dirname, 'alldesign-karl/privacidad/index.html'),
       },
       output: {

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#F1EBE1" />
+    <link rel="icon" href="/alldesign-karl/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/alldesign-karl/favicon-64.png" sizes="64x64" type="image/png" />
+    <link rel="apple-touch-icon" href="/alldesign-karl/apple-touch-icon.png" />
+    <title>Tienda — Alldesign Karl</title>
+    <meta name="description" content="Tienda online de Alldesign Karl: piezas artesanales hechas a mano en Aragón, letras decoradas personalizadas y tarjeta regalo. Pago seguro." />
+    <meta property="og:site_name" content="Alldesign Karl" />
+    <meta property="og:title" content="Tienda — Alldesign Karl" />
+    <link rel="preconnect" href="https://www.wixapis.com" />
+    <link rel="preconnect" href="https://static.wixstatic.com" />
+    <link rel="preload" href="/alldesign-karl/fonts/cormorant-garamond-normal-latin-2fed1d.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/alldesign-karl/fonts/pinyon-script-normal-latin-cfbbdd.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 1.5c.5 5.6 4.9 10 10.5 10.5-5.6.5-10 4.9-10.5 10.5C11.5 16.9 7.1 12.5 1.5 12 7.1 11.5 11.5 7.1 12 1.5z" fill="currentColor"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.8" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="m15.6 15.6 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8.5h14l-1.1 12.2H6.1z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8.6 8.5V7a3.4 3.4 0 0 1 6.8 0v1.5" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3.5 7.5h17M3.5 12h17M3.5 16.5h17" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m5.5 5.5 13 13m0-13-13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 12"><path d="M0 6h22m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 48 48"><path d="M24 6c6 7 10 12 10 18a10 10 0 0 1-20 0c0-6 4-11 10-18z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M24 18c2.4 3 4 5.4 4 7.6a4 4 0 0 1-8 0c0-2.2 1.6-4.6 4-7.6z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 40h32" stroke="currentColor" stroke-width="1.2"/></symbol>
+    <symbol id="i-flower" viewBox="0 0 48 48"><circle cx="24" cy="24" r="4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M24 20c-3-6-1-12 0-14 1 2 3 8 0 14zm0 8c3 6 1 12 0 14-1-2-3-8 0-14zm-4-4c-6 3-12 1-14 0 2-1 8-3 14 0zm8 0c6-3 12-1 14 0-2 1-8 3-14 0z" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 48 48"><path d="M24 6 39 12v11c0 9.5-6.3 16.5-15 19-8.7-2.5-15-9.5-15-19V12z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="m17.5 24 4.5 4.5 8.5-9" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<header class="site-header" id="header">
+  <div class="wrap hdr">
+    <a class="brand" href="/alldesign-karl/" aria-label="Alldesign Karl, volver a la web"><img class="brandmark" src="/alldesign-karl/logo-256.webp" alt="" width="256" height="256" /></a>
+    <nav class="nav" aria-label="Principal">
+      <a href="/alldesign-karl/">Inicio</a>
+      <a href="#colecciones" aria-current="page">Tienda</a>
+      <a href="#tarjeta-regalo">Tarjeta regalo</a>
+      <a href="/alldesign-karl/presupuesto/">Empresas</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <div class="hdr-icons">
+      <button class="icon-btn" id="open-search" aria-label="Buscar"><svg><use href="#i-search"/></svg></button>
+      <button class="icon-btn" id="open-cart" aria-label="Abrir la cesta"><svg><use href="#i-bag"/></svg><span class="bag-count" id="bag-count">0</span></button>
+      <button class="icon-btn" id="open-menu" aria-label="Abrir menú"><svg><use href="#i-menu"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="shop-hero" id="inicio">
+    <div class="wrap">
+      <p class="caps reveal">Alldesign Karl · Tienda online</p>
+      <h1 class="reveal">La tienda</h1>
+      <p class="lead reveal">Piezas hechas a mano, una a una, en nuestro taller de Aragón. Elige la tuya, personalízala y te la enviamos a casa.</p>
+      <div class="ornament reveal" aria-hidden="true"><svg class="star"><use href="#i-star"/></svg></div>
+      <p class="perks reveal"><span><svg><use href="#i-star"/></svg>Hecho a mano</span><span><svg><use href="#i-star"/></svg>Envío gratis</span><span><svg><use href="#i-star"/></svg>Pago seguro</span></p>
+    </div>
+  </section>
+
+  <section class="shop sec" id="colecciones">
+    <div class="wrap">
+      <div class="sec-title">
+        <p class="caps reveal">Catálogo</p>
+        <h2 class="reveal">Nuestras colecciones</h2>
+        <p class="reveal">Piezas pintadas a mano, una a una, con el tiempo y el cuidado que merece lo auténtico.</p>
+        <div class="ornament reveal" aria-hidden="true"><svg class="star"><use href="#i-star"/></svg></div>
+      </div>
+      <div class="toolbar" id="toolbar" hidden></div>
+      <div class="grid" id="grid" aria-live="polite"></div>
+      <div class="empty" id="empty" hidden>
+        <span class="script">Nueva colección muy pronto</span>
+        <p>Estamos dando los últimos retoques a las primeras piezas. Escríbenos y te avisaremos en cuanto estén disponibles.</p>
+        <a class="pill caps" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=alldesignkarl@gmail.com&amp;su=Av%C3%ADsame%20de%20la%20nueva%20colecci%C3%B3n" target="_blank" rel="noopener">Avísame <svg class="arrow"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+  </section>
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="shop-b2b reveal">
+        <div>
+          <p class="caps">Para empresas</p>
+          <h3>¿Regalos para tu empresa o un pedido grande?</h3>
+          <p>Preparamos pedidos personalizados y al por mayor con presupuesto a medida.</p>
+        </div>
+        <a class="pill caps" style="margin-top:0" href="/alldesign-karl/presupuesto/">Pedir presupuesto <svg class="arrow"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="gift sec" id="tarjeta-regalo">
+    <div class="wrap">
+      <div class="sec-title">
+        <p class="caps reveal">Para regalar</p>
+        <h2 class="reveal">Tarjeta regalo</h2>
+        <p class="reveal">El regalo perfecto cuando no sabes qué elegir: que elijan ellos su pieza favorita.</p>
+        <div class="ornament reveal" aria-hidden="true"><svg class="star"><use href="#i-star"/></svg></div>
+      </div>
+      <div class="gift-grid">
+        <div class="gift-art reveal">
+          <div class="gift-card">
+            <div class="gift-fallback" aria-hidden="true"><span class="script">Alldesign Karl</span><span class="caps">Tarjeta regalo</span></div>
+            <img id="gc-img" src="https://static.wixstatic.com/media/43eaa1_5439905b93b943498e6a185ac4867adb~mv2.jpg/v1/fit/w_1200,h_800,q_90,enc_auto/tarjeta-regalo.jpg" alt="Tarjeta regalo de Alldesign Karl" loading="lazy">
+          </div>
+        </div>
+        <div class="gift-copy reveal">
+          <p class="gift-lead" id="gc-desc">Regala la libertad de elegir. Una tarjeta regalo perfecta para disfrutar de sus piezas favoritas y encontrar algo especial.</p>
+          <div class="opt">
+            <div class="opt-label">Elige el importe<span class="opt-picked" id="gc-picked"></span></div>
+            <div class="gift-amounts" id="gc-amounts"></div>
+          </div>
+          <ul class="gift-how">
+            <li><svg><use href="#i-star"/></svg><span>Al comprarla, recibes la tarjeta con su código en tu correo.</span></li>
+            <li><svg><use href="#i-star"/></svg><span>Puedes reenviarla o imprimirla para regalarla a quien quieras.</span></li>
+            <li><svg><use href="#i-star"/></svg><span id="gc-expiry">Se canjea al pagar en nuestra tienda y no caduca.</span></li>
+          </ul>
+          <div class="pd-actions">
+            <button class="pill dark caps" id="gc-add" type="button" disabled>Añadir a la cesta <svg class="arrow"><use href="#i-arrow"/></svg></button>
+          </div>
+          <p class="pd-note" id="gc-note">Elige un importe.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+  <section class="contact sec" id="contacto">
+    <div class="wrap">
+      <div class="sec-title">
+        <p class="caps reveal">Contacto</p>
+        <h2 class="reveal">Hablemos</h2>
+        <p class="reveal">¿Una duda sobre alguna pieza o un encargo especial? Estaremos encantados de ayudarte.</p>
+      </div>
+      <div class="contact-links reveal">
+        <a class="contact-mail" data-contact="email" href="mailto:alldesignkarl@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></svg><span>alldesignkarl@gmail.com</span></a>
+        <a class="contact-mail" data-contact="phone" href="tel:+34661307918"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><span>661 30 79 18</span></a>
+        <a class="contact-mail" data-contact="instagram" href="https://www.instagram.com/alldesignkarl/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg><span>Instagram</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <img class="brandmark" src="/alldesign-karl/logo-256.webp" alt="Alldesign Karl" width="256" height="256" style="width:84px;height:84px" />
+        <p>Artesanía · Diseño · Tradición</p>
+      </div>
+      <div class="foot-col">
+        <h4 class="caps">Explorar</h4>
+        <a href="/alldesign-karl/">La web</a>
+        <a href="#colecciones">Tienda</a>
+        <a href="#tarjeta-regalo">Tarjeta regalo</a>
+        <a href="/alldesign-karl/presupuesto/">Pedir presupuesto</a>
+      </div>
+      <div class="foot-col">
+        <h4 class="caps">Tu compra</h4>
+        <button type="button" data-open-cart>Mi cesta</button>
+        <a data-contact="email" data-contact-text href="mailto:alldesignkarl@gmail.com">alldesignkarl@gmail.com</a>
+        <a data-contact="phone" data-contact-text href="tel:+34661307918">661 30 79 18</a>
+        <a href="/alldesign-karl/privacidad/">Privacidad</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; <span id="year">2026</span> Alldesign Karl · Hecho a mano en Aragón</span>
+      <a href="#inicio" style="text-decoration:none">Volver arriba ↑</a>
+    </div>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menú" aria-hidden="true">
+  <div class="wrap hdr">
+    <img class="brandmark" src="/alldesign-karl/logo-256.webp" alt="" width="256" height="256" />
+    <div class="hdr-icons"><button class="icon-btn" data-close aria-label="Cerrar menú"><svg><use href="#i-close"/></svg></button></div>
+  </div>
+  <nav>
+    <a href="/alldesign-karl/">Inicio</a>
+    <a href="#colecciones">Tienda</a>
+    <a href="#tarjeta-regalo">Tarjeta regalo</a>
+    <a href="/alldesign-karl/presupuesto/">Empresas</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
+  <p class="menu-foot caps">Artesanía · Diseño · Tradición</p>
+</div>
+
+    <a href="#colecciones">Colecciones</a>
+    <a href="#nosotros">Sobre nosotros</a>
+    <a href="#contacto">Contacto</a>
+    <a href="#tarjeta-regalo">Tarjeta regalo</a>
+  </nav>
+  <p class="menu-foot caps">Porcelana · Arte · Tradición</p>
+</div>
+
+<div class="search" id="search" role="dialog" aria-modal="true" aria-label="Buscar" aria-hidden="true">
+  <div class="wrap">
+    <div class="search-bar">
+      <svg class="star" style="width:22px;height:22px;color:var(--gold)"><use href="#i-search"/></svg>
+      <input id="search-input" type="search" placeholder="Buscar una pieza…" autocomplete="off" aria-label="Buscar una pieza">
+      <button class="icon-btn" data-close aria-label="Cerrar búsqueda"><svg><use href="#i-close"/></svg></button>
+    </div>
+    <div id="search-out"><p class="search-hint">Escribe el nombre de una pieza.</p></div>
+  </div>
+</div>
+
+<div class="modal" id="product" role="dialog" aria-modal="true" aria-labelledby="pd-name" aria-hidden="true">
+  <div class="modal-card">
+    <div class="gallery">
+      <span class="pd-tag caps" id="pd-tag" hidden>Vista previa con tus colores</span>
+      <img class="gallery-main" id="pd-img" alt="">
+      <div class="thumbs" id="pd-thumbs"></div>
+    </div>
+    <div class="pd">
+      <button class="icon-btn pd-close" data-close aria-label="Cerrar"><svg><use href="#i-close"/></svg></button>
+      <p class="caps">Alldesign Karl</p>
+      <h3 id="pd-name"></h3>
+      <p class="pd-price" id="pd-price"></p>
+      <p class="pd-pack" id="pd-pack" hidden></p>
+      <div id="pd-options"></div>
+      <div id="pd-mods"></div>
+      <div class="pd-actions">
+        <div class="qty" aria-label="Cantidad">
+          <button type="button" id="pd-minus" aria-label="Quitar una">−</button>
+          <span id="pd-qty">1</span>
+          <button type="button" id="pd-plus" aria-label="Añadir una">+</button>
+        </div>
+        <button class="pill dark caps" id="pd-add" type="button">Añadir a la cesta <svg class="arrow"><use href="#i-arrow"/></svg></button>
+      </div>
+      <p class="pd-note" id="pd-note"></p>
+      <div class="pd-desc" id="pd-desc"></div>
+    </div>
+  </div>
+</div>
+
+<aside class="drawer" id="cart" role="dialog" aria-modal="true" aria-label="Tu cesta" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>Tu cesta</h2>
+    <button class="icon-btn" data-close aria-label="Cerrar la cesta"><svg><use href="#i-close"/></svg></button>
+  </div>
+  <div class="drawer-body" id="cart-body"></div>
+  <div class="drawer-foot" id="cart-foot" hidden>
+    <div class="subtotal"><span>Subtotal (sin IVA)</span><strong id="cart-subtotal"></strong></div>
+    <div class="subtotal"><span>IVA (21 %)</span><strong id="cart-vat"></strong></div>
+    <div class="subtotal"><span>Envío</span><strong>Gratis</strong></div>
+    <div class="subtotal total"><span>Total</span><strong id="cart-total"></strong></div>
+    <small>Precios sin IVA. Al total se le suma el IVA del 21 %.</small>
+    <button class="pill dark caps" id="checkout" type="button">Finalizar compra <svg class="arrow"><use href="#i-arrow"/></svg></button>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="/src/alldesign/shop.ts"></script>
+</body>
+</html>
