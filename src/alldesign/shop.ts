@@ -1061,6 +1061,12 @@ applyContact();
   });
 
   loadProducts();
+  // Enlaces de la web a una pieza concreta: /tienda/#p=<id del producto>.
+  var wanted = /^#p=([\w-]+)$/.exec(location.hash);
+  if (wanted && findProduct(wanted[1])) {
+    document.getElementById("colecciones").scrollIntoView();
+    openProduct(wanted[1]);
+  }
   loadGift();
   loadCart();
 })();
