@@ -21,6 +21,7 @@ import {
   type QuoteFile,
   type QuotePayload,
 } from '../src/alldesign/quote-config.js';
+import { saveRecord } from './_store.js';
 
 // Variables de entorno de Vercel. Se declara aqui para no depender de los
 // tipos de Node al compilar la funcion.
@@ -186,10 +187,14 @@ export async function POST(request: Request): Promise<Response> {
     return json(200, { ok: true, dryRun: true });
   }
 
+  // Copia en el panel de pedidos (sin los archivos), por si el correo falla.
+  const ref = `P-${Date.now().toString(36).toUpperCase()}`;
+  const saved = await saveRecord('presupuestos', ref, { subject: mail.subject, text: mail.text, archivos: files.map((f) => `${f.name} (${kb(f.size)})`) });
+
   const key = process.env.RESEND_API_KEY;
   // Sin clave de Resend, el envio lo hace el navegador con FormSubmit, que
   // rechaza las peticiones que salen de servidores. Aqui ya se ha validado todo.
-  if (!key) return json(200, { ok: true, relay: 'formsubmit', to, subject: mail.subject, when });
+  if (!key) return json(200, { ok: true, relay: 'formsubmit', to, subject: mail.subject, when, saved });
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',

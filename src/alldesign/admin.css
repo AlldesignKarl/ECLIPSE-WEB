@@ -1,0 +1,29 @@
+:root{--ivory:#f1ebe1;--paper:#fbf8f2;--line:#ddd0bb;--ink:#4a4036;--ink-2:#7a6d5f;--gold:#b08a4a;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Jost','Helvetica Neue',Arial,sans-serif;}
+*{box-sizing:border-box;}
+html,body{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--serif);font-size:18px;}
+.adm{max-width:900px;margin:0 auto;padding:32px 16px 80px;}
+.adm-top{display:flex;align-items:center;gap:16px;}
+.adm-top img{border-radius:50%;}
+.adm-top .ghost{margin-left:auto;}
+.k{margin:0;font:500 11px var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--ink-2);}
+h1{margin:2px 0 0;font-weight:400;font-size:34px;}
+.login{margin-top:40px;max-width:380px;display:grid;gap:10px;}
+.login label{font:500 12px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2);}
+input{padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font:inherit;color:var(--ink);}
+button{font:500 12px var(--sans);letter-spacing:.2em;text-transform:uppercase;padding:13px 20px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--ivory);cursor:pointer;}
+button.ghost{background:none;color:var(--ink);}
+.msg{min-height:1.2em;color:#9a3b2a;font-size:16px;margin:0;}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:32px 0 20px;}
+.tabs [data-k]{background:none;color:var(--ink);border-color:var(--line);}
+.tabs [aria-pressed="true"]{background:var(--ink);color:var(--ivory);border-color:var(--ink);}
+.tabs span{opacity:.7;margin-left:4px;}
+#reload{margin-left:auto;}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:14px;}
+.card header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px;}
+.card time{color:var(--ink-2);font-size:15px;}
+dl{display:grid;grid-template-columns:minmax(120px,max-content) 1fr;gap:6px 16px;margin:0;}
+dt{color:var(--ink-2);font-size:15px;}
+dd{margin:0;white-space:pre-wrap;}
+pre{white-space:pre-wrap;font:inherit;margin:0;}
+.empty{color:var(--ink-2);}
+@media (max-width:560px){dl{grid-template-columns:1fr;}dt{margin-top:6px;}}

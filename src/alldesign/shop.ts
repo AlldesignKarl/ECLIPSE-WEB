@@ -806,9 +806,10 @@ applyContact();
         fd.append("_replyto", payload.cliente.email);
         out.rows.forEach(function (row) { fd.append(row[0], row[1] || "—"); });
         return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(out.to), { method: "POST", headers: { Accept: "application/json" }, body: fd })
-          .then(function (r2) { return r2.json().catch(function () { return {}; }); })
+          .then(function (r2) { return r2.json().catch(function () { return {}; }); }, function () { return {}; })
           .then(function (fs) {
-            if (String(fs.success) === "true") return out;
+            // Si el correo falla pero quedó guardado en el servidor, el envío es correcto.
+            if (String(fs.success) === "true" || out.saved) return out;
             // Pasa si el envío por correo aún no está activado en FormSubmit.
             throw new Error("No hemos podido enviarlo en este momento. Inténtalo de nuevo en unos minutos.");
           });

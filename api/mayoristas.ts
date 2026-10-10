@@ -20,6 +20,7 @@ import {
   type Linea,
   type Registro,
 } from '../src/alldesign/wholesale.js';
+import { saveRecord, listRecords, isAdmin, type Kind } from './_store.js';
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -101,9 +102,12 @@ function html(title: string, rows: [string, string][]) {
   return `<!doctype html><html><body style="margin:0;background:#f1ebe1;padding:32px 16px;font-family:Georgia,serif;color:#1c1a17"><div style="max-width:640px;margin:0 auto;background:#fbf8f2;border:1px solid #e3d8c6;padding:32px"><p style="margin:0 0 6px;font:500 11px Helvetica,Arial,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#7a6d5f">Alldesign Karl · Mayoristas</p><h1 style="margin:0 0 20px;font-weight:400;font-size:24px">${esc(title)}</h1><table style="border-collapse:collapse">${tr}</table></div></body></html>`;
 }
 
-async function deliver(subject: string, rows: [string, string][], replyTo: string, extra: Record<string, unknown>) {
+async function deliver(kind: Kind, ref: string, subject: string, rows: [string, string][], replyTo: string, extra: Record<string, unknown>) {
   const to = process.env.EMAIL_TO || 'alldesignkarl@gmail.com';
   const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n');
+  // Primero se guarda: aunque el correo falle, queda en el panel de pedidos.
+  const saved = await saveRecord(kind, ref, { subject, rows });
+  extra = { ...extra, saved };
   if (process.env.EMAIL_DRY_RUN === '1') {
     console.log(`[mayoristas] (prueba) a ${to}\nAsunto: ${subject}\n\n${text}`);
     return json(200, { ok: true, dryRun: true, ...extra });
@@ -147,7 +151,8 @@ export async function POST(request: Request): Promise<Response> {
 
   if (body.tipo === 'registro') {
     const rows = [...clientRows(cliente), ['Fecha de alta', when] as [string, string]];
-    return deliver(`Nuevo cliente mayorista - ${cliente.empresa}`, rows, cliente.email, {});
+    const ref = `A-${Date.now().toString(36).toUpperCase()}`;
+    return deliver('altas', ref, `Nuevo cliente mayorista - ${cliente.empresa}`, rows, cliente.email, { ref });
   }
 
   if (body.tipo !== 'pedido') return json(400, { ok: false, error: 'Tipo de envío desconocido.' });
@@ -182,8 +187,19 @@ export async function POST(request: Request): Promise<Response> {
     ['Observaciones', clean(body.notas, 1000) || '—'],
     ['Fecha del pedido', when],
   ];
-  return deliver(`Nuevo pedido mayorista ${ref} - ${cliente.empresa} - ${eur(subtotal)}`, rows, cliente.email, {
+  return deliver('pedidos', ref, `Nuevo pedido mayorista ${ref} - ${cliente.empresa} - ${eur(subtotal)}`, rows, cliente.email, {
     ref,
     subtotal,
   });
+}
+
+// Panel de pedidos: GET /api/mayoristas con la cabecera x-admin-key.
+export async function GET(request: Request): Promise<Response> {
+  if (!isAdmin(request.headers.get('x-admin-key'))) return json(401, { ok: false, error: 'Contraseña incorrecta.' });
+  try {
+    return json(200, { ok: true, items: await listRecords() });
+  } catch (e) {
+    console.error('[mayoristas] panel', e);
+    return json(500, { ok: false, error: 'No se han podido cargar los pedidos.' });
+  }
 }

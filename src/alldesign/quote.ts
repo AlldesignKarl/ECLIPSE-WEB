@@ -323,7 +323,7 @@ form.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(d),
     });
-    const out = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; fields?: Record<string, string>; relay?: string; to?: string; subject?: string; when?: string };
+    const out = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; fields?: Record<string, string>; relay?: string; to?: string; subject?: string; when?: string; saved?: boolean };
     if (!res.ok || !out.ok) {
       if (out.fields) {
         const fields = out.fields;
@@ -336,7 +336,8 @@ form.addEventListener('submit', async (e) => {
     }
     if (out.relay === 'formsubmit') {
       const sent = await relayFormSubmit(d, out.to!, out.subject!, out.when!);
-      if (sent !== true) {
+      // Si el correo falla pero la solicitud quedó guardada en el servidor, ha llegado.
+      if (sent !== true && !out.saved) {
         fail(sent);
         return;
       }

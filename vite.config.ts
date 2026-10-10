@@ -16,16 +16,16 @@ function apiDev(): Plugin {
         const chunks: Buffer[] = [];
         for await (const c of req) chunks.push(c as Buffer);
         const mod = await server.ssrLoadModule(`/api/${name}.ts`);
-        const handler = req.method === 'POST' ? mod.POST : null;
+        const handler = req.method === 'POST' || req.method === 'GET' ? mod[req.method] : null;
         if (!handler) {
           res.statusCode = 405;
           res.end();
           return;
         }
         const request = new Request(`http://localhost${req.originalUrl ?? ''}`, {
-          method: 'POST',
+          method: req.method,
           headers: req.headers as Record<string, string>,
-          body: Buffer.concat(chunks),
+          body: req.method === 'POST' ? Buffer.concat(chunks) : undefined,
         });
         const out: Response = await handler(request);
         res.statusCode = out.status;
@@ -48,6 +48,7 @@ export default defineConfig({
         alldesign: resolve(__dirname, 'alldesign-karl/index.html'),
         presupuesto: resolve(__dirname, 'alldesign-karl/presupuesto/index.html'),
         tienda: resolve(__dirname, 'alldesign-karl/tienda/index.html'),
+        pedidos: resolve(__dirname, 'alldesign-karl/pedidos/index.html'),
         privacidad: resolve(__dirname, 'alldesign-karl/privacidad/index.html'),
       },
       output: {
